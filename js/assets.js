@@ -2,19 +2,19 @@
   {
     "id": "anchor",
     "name": "Anchor",
-    "file": "./assets/svg/anchor.svg",
+    "file": "./assets/BettyBoop.svg",
     "preview": "./assets/previews/anchor.png"
   },
   {
     "id": "wave",
     "name": "Wave",
-    "file": "./assets/svg/wave.svg",
+    "file": "./assets/coffeeghost.svg",
     "preview": "./assets/previews/wave.png"
   },
   {
     "id": "monogram",
     "name": "Monogram",
-    "file": "./assets/svg/monogram.svg",
+    "file": "./assets/sexyshrimp.svg",
     "preview": "./assets/previews/monogram.png"
   }
 ]
