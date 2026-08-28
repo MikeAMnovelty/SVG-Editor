@@ -2,19 +2,19 @@
   {
     "id": "anchor",
     "name": "Anchor",
-    "file": "./assets/BettyBoop.svg",
-    "preview": "./assets/BettyBoop.svg"
+    "file": "./asset/BettyBoop.svg",
+    "preview": "./asset/BettyBoop.svg"
   },
   {
     "id": "wave",
     "name": "Wave",
-    "file": "./assets/coffeeghost.svg",
-    "preview": "./assets/coffeeghost.svg"
+    "file": "./asset/coffeeghost.svg",
+    "preview": "./asset/coffeeghost.svg"
   },
   {
     "id": "monogram",
     "name": "Monogram",
-    "file": "./assets/sexyshrimp.svg",
-    "preview": "./assets/sexyshrimp.svg"
+    "file": "./asset/sexyshrimp.svg",
+    "preview": "./asset/sexyshrimp.svg"
   }
 ]
