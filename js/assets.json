@@ -4,9 +4,33 @@
     "name": "Falling in Reverse",
     "children": [
       {"type": "file", "id": "FIR Logo", "name": "FIR Logo", "file": "./asset/Falling in Reverse/FIRlogo.svg" },
-      {"type": "file", "id": "Ronnie Radcliff RR", "name": "RR", "file": "./asset/Falling in Reverse/RR.svg" }
+      {"type": "file", "id": "Ronnie Radcliff RR", "name": "RR", "file": "./asset/Falling in Reverse/RR.svg" },
+      {"type": "file", "id": "Pill", "name": "Pill", "file": "./asset/Falling in Reverse/Pill.svg"},
+      {"type": "file", "id": "SkullNDagger", "Name": "Skull N Dagger", "file": "./asset/Falling in Reverse/SkullNDagger.svg"},
+      {"type": "file", "id": "InRonnieWeTrust", "Name": "In Ronnie We Trust", "file": "./asset/Falling in Reverse/InRonnieWeTrust.svg"}
     ]
   },
+  {
+    "type": "folder",
+    "name": "Megadeth",
+    "children": [
+
+    ]
+  }
+  {
+    "type": "folder",
+    "name": "Pierce The Veil",
+    "children": [
+
+    ]
+  }
+  {
+    "type": "folder",
+    "name": "Sleep Token",
+    "children" [
+      
+    ]
+  }
   {
     "type": "folder",
     "name": "Cartoon",
