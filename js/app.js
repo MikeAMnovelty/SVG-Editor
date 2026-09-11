@@ -1,4 +1,4 @@
-/async function loadAssets() {
+async function loadAssets() {
   const res = await fetch('./js/assets.json');
   const data = await res.json();
   const list = document.getElementById('assetList');
