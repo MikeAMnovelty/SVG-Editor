@@ -5,6 +5,7 @@
     "children": [
       {"type": "file", "id": "FIR Logo", "name": "FIR Logo", "file": "./asset/Falling in Reverse/FIRlogo.svg" },
       {"type": "file", "id": "Ronnie Radcliff RR", "name": "RR", "file": "./asset/Falling in Reverse/RR.svg" }
+    ]
     
     "id": "Betty",
     "name": "BettyBoop",
