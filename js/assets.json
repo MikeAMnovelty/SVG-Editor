@@ -10,7 +10,7 @@
   {
     "type": "folder",
     "name": "Cartoon",
-    "childeren": [
+    "children": [
       {"type": "file", "id": "Betty", "name": "BettyBoop", "file": "./asset/Cartoon/BettyBoop.svg" },
       {"type": "file", "id": "ghost", "name": "Ghost", "file": "./asset/Cartoon/coffeeghost.svg" },
       {"type": "file", "id": "shrimp", "name": "Shrimp", "file": "./asset/Cartoon/sexyshrimp.svg"}
