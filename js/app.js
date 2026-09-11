@@ -1,28 +1,58 @@
-// ─── Define your SVG assets ─────────────────────────────────────────────────
-async function loadAssets() {
+/async function loadAssets() {
   const res = await fetch('./js/assets.json');
-  const assets = await res.json();
+  const data = await res.json();
   const list = document.getElementById('assetList');
+  list.innerHTML = '';
+  list.appendChild(renderNodes(data));
+}
 
-  list.innerHTML = assets.map(a => `
-    <div class="asset" draggable="true" data-file="${a.file}">
-      <img src="${a.preview}" alt="${a.name}">
-      <span>${a.name}</span>
-    </div>
-  `).join('');
+function renderNodes(nodes) {
+  const container = document.createElement('div');
 
-  list.querySelectorAll('.asset').forEach(item => {
-    item.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('text/plain', item.dataset.file);
-      item.style.opacity = '0.4';
-    });
-    item.addEventListener('dragend', () => {
-      item.style.opacity = '1';
-    });
+  nodes.forEach(n => {
+    if (n.type === 'folder') {
+      const folder = document.createElement('div');
+      folder.className = 'folder';
+      const header = document.createElement('div');
+      header.className = 'folder-header';
+      header.textContent = '▸ ' + n.name;
+      folder.appendChild(header);
+
+      const childrenWrap = document.createElement('div');
+      childrenWrap.className = 'folder-children';
+      childrenWrap.style.display = 'none';
+      childrenWrap.appendChild(renderNodes(n.children || []));
+      folder.appendChild(childrenWrap);
+
+      header.addEventListener('click', () => {
+        const open = childrenWrap.style.display === 'block';
+        childrenWrap.style.display = open ? 'none' : 'block';
+        header.textContent = (open ? '▸ ' : '▾ ') + n.name;
+      });
+
+      container.appendChild(folder);
+    } else if (n.type === 'file') {
+      const item = document.createElement('div');
+      item.className = 'asset';
+      item.draggable = true;
+      item.dataset.file = n.file;
+      item.innerHTML = `<img src="${n.file}" alt="${n.name}"><span>${n.name}</span>`;
+
+      item.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', item.dataset.file);
+        item.classList.add('dragging');
+      });
+      item.addEventListener('dragend', () => item.classList.remove('dragging'));
+
+      container.appendChild(item);
+    }
   });
+
+  return container;
 }
 
 loadAssets();
+
 
 // ─── Canvas & Viewport Setup ────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
