@@ -6,10 +6,10 @@
       {"type": "file", "id": "FIR Logo", "name": "FIR Logo", "file": "./asset/Falling in Reverse/FIRlogo.svg" },
       {"type": "file", "id": "Ronnie Radcliff RR", "name": "RR", "file": "./asset/Falling in Reverse/RR.svg" },
       {"type": "file", "id": "Pill", "name": "Pill", "file": "./asset/Falling in Reverse/Pill.svg"},
-      {"type": "file", "id": "SkullNDagger", "Name": "Skull N Dagger", "file": "./asset/Falling in Reverse/SkullNDagger.svg"},
-      {"type": "file", "id": "InRonnieWeTrust", "Name": "In Ronnie We Trust", "file": "./asset/Falling in Reverse/InRonnieWeTrust.svg"},
-      {"type": "file", "id": "CatX", "Name": "Cat X", "file": "./asset/Falling in Reverse/CatX.svg"},
-      {"type": "file", "id": "Lips", "Name": "Lips", "file": "./asset/Falling in Reverse/Lips.svg"},
+      {"type": "file", "id": "SkullNDagger", "name": "Skull N Dagger", "file": "./asset/Falling in Reverse/SkullNDagger.svg"},
+      {"type": "file", "id": "InRonnieWeTrust", "name": "In Ronnie We Trust", "file": "./asset/Falling in Reverse/InRonnieWeTrust.svg"},
+      {"type": "file", "id": "CatX", "name": "Cat X", "file": "./asset/Falling in Reverse/CatX.svg"},
+      {"type": "file", "id": "Lips", "name": "Lips", "file": "./asset/Falling in Reverse/Lips.svg"},
       {"type": "file", "id": "PopularMonster", "name": "Popuar Monster", "file": "./asset/Falling in Reverse/PopularMonster.svg"},
       {"type": "file", "id": "Vampire", "name": "I'm a Vampire", "file": "./asset/Falling in Reverse/Vampire.svg"}
     ]
