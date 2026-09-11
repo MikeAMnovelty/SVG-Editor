@@ -1,0 +1,6 @@
+/* css/svgedit.css - minimal fallback for svg-edit UI elements */
+.svgedit_container, .svgedit-toolbar, .svgedit_panel { box-sizing: border-box; font-family: inherit; }
+.svgedit_toolbar, .svgedit-panel { background: #fafafa; border: 1px solid #e6e6e6; padding: 6px; }
+.svgedit_button { padding: 6px 8px; margin: 2px; border-radius: 4px; cursor: pointer; background:#fff; border:1px solid #ddd; }
+.svgedit_button:hover { background:#f0f4ff; }
+.svgedit_hidden { display: none !important; }
