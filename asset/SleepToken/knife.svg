@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="10mm"
+   height="40mm"
+   viewBox="0 0 10 40"
+   version="1.1"
+   id="svg3171"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   sodipodi:docname="knife.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview3173"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.3488504"
+     inkscape:cx="63.009547"
+     inkscape:cy="92.81136"
+     inkscape:window-width="1440"
+     inkscape:window-height="782"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs3168" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path6361"
+       style="display:inline;fill:black;fill-opacity:1;stroke:none;stroke-width:0.259105;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       d="m 4.6144979,35.082747 c 0.12431,0.46963 0.40553,0.98343 0.61117,1.16146 0.63351,0.50431 1.19355,-0.48106 0.98122,-0.72953 -0.21669,-0.28314 -0.79799,-0.46215 -1.59239,-0.43193 z m 0.91713,-1.41322 c 0.29555,0.38556 0.75288,0.75147 1.01124,0.83663 0.77883,0.22152 0.91631,-0.9035 0.62469,-1.05108 -0.309,-0.17789 -0.91441,-0.11929 -1.63593,0.21445 z m -3.60197,5.90599 c -1.14622997,-0.60719 -0.0477,-11.90804 0.64047,-21.253706 l 1.73376,-15.9143498 c 0.11163,-1.61037003 1.63264,-2.48738003 2.72813,-0.94672 0.65909,0.8496 0.73453,1.68715 0.44949,2.51723 -0.16199,0.5660398 -0.78963,0.3785398 -0.76702,1.1230598 0.0455,2.75199 -0.17594,5.44571 -0.83185,8.27352 -0.22408,0.94341 -0.42854,2.15164 0.75443,2.32287 0.74816,0.0984 1.17573,0.64123 1.07396,1.42667 -1.57275,8.188076 -2.09379,18.466096 -5.78137,22.451426 z" />
+  </g>
+</svg>

@@ -44,7 +44,17 @@
       {"type": "file", "id": "arcadia", "name": "Even in Arcadia", "file": "./asset/SleepToken/eveninarcadia.svg"},
       {"type": "file", "id": "logo", "name": "Sleep Token", "file": "./asset/SleepToken/logo.svg"},
       {"type": "file", "id": "cyclemustend", "name": "The Cycle Must End", "file": "./asset/SleepToken/thecyclemustend.svg"},
-      {"type": "file", "id": "vessel", "name": "Vessel", "file": "./asset/SleepToken/vessel.svg"}
+      {"type": "file", "id": "vessel", "name": "Vessel", "file": "./asset/SleepToken/vessel.svg"},
+      {"type": "file", "id": "knife", "name": "Knife", "file": "./asset/SleepToken/knife.svg"},
+      {"type": "file", "id": "symbol1", "name": "Symbol 1", "file": "./asset/SleepToken/symbol1.svg"},
+      {"type": "file", "id": "symbol2", "name": "Symbol 2", "file": "./asset/SleepToken/symbol2.svg"},
+      {"type": "file", "id": "symbol3", "name": "Symbol 3", "file": "./asset/SleepToken/symbol3.svg"},
+      {"type": "file", "id": "symbol4", "name": "Symbol 4", "file": "./asset/SleepToken/symbol4.svg"},
+      {"type": "file", "id": "symbol5", "name": "Symbol 5", "file": "./asset/SleepToken/symbol5.svg"},
+      {"type": "file", "id": "symbol6", "name": "Symbol 6", "file": "./asset/SleepToken/symbol6.svg"},
+      {"type": "file", "id": "symbol7", "name": "Symbol 7", "file": "./asset/SleepToken/symbol7.svg"},
+      {"type": "file", "id": "symbol8", "name": "Symbol 8", "file": "./asset/SleepToken/symbol8.svg"},
+      {"type": "file", "id": "symbol9", "name": "Symbol 9", "file": "./asset/SleepToken/symbol9.svg"}
     ]
   },
   {
