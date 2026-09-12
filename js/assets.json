@@ -34,7 +34,18 @@
     "name": "Bad Omens",
     "children": [
       {"type": "file", "id": "logo", "name": "Bad Omen Logo", "file": "./asset/Bad Omen/logo.svg"},
-      {"type": "file", "id": "Noah", "name": "Noah", "file": "./asset/Bad Omen/noah.svg"}
+      {"type": "file", "id": "Noah", "name": "Noah", "file": "./asset/Bad Omen/noah.svg"},
+      {"type": "file", "id": "badomen", "name": "Bad Omen", "file": "./asset/Bad Omen/BadOmen.svg"},
+      {"type": "file", "id": "dead", "name": "Dead on the Inside", "file": "./asset/Bad Omen/dead.svg"},
+      {"type": "file", "id": "death", "name": "Death", "file": "./asset/Bad Omen/death.svg"},
+      {"type": "file", "id": "key", "name": "Key", "file": "./asset/Bad Omen/key.svg"},
+      {"type": "file", "id": "lockedheart", "name": "Locked Heart", "file": "./asset/Bad Omen/lockedheart.svg"},
+      {"type": "file", "id": "moon", "name": "Moon", "file": "./asset/Bad Omen/moon.svg"},
+      {"type": "file", "id": "skullandsnake", "name": "Skull and Snake", "file": "./asset/Bad Omen/skullandsnake.svg"},
+      {"type": "file", "id": "star", "name": "Star", "file": "./asset/Bad Omen/star.svg"},
+      {"type": "file", "id": "symbol1", "name": "Symbol 1", "file": "./asset/Bad Omen/symbol1.svg"},
+      {"type": "file", "id": "symbol2", "name": "Symbol 2", "file": "./asset/Bad Omen/symbol2.svg"},
+      {"type": "file", "id": "symbol3", "name": "Symbol 3", "file": "./asset/Bad Omen/symbol3.svg"}
     ]
   },
   {
@@ -61,7 +72,7 @@
   },
   {
     "type": "folder",
-    "name": "Cartoon",
+    "name": "70 & 80 Bands",
     "children": [
       {"type": "file", "id": "Betty", "name": "BettyBoop", "file": "./asset/Cartoon/BettyBoop.svg" },
       {"type": "file", "id": "ghost", "name": "Ghost", "file": "./asset/Cartoon/coffeeghost.svg" },
