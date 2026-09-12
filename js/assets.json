@@ -40,7 +40,11 @@
     "type": "folder",
     "name": "Sleep Token",
     "children": [
-
+      {"type": "file", "id": "backtoeden", "name": "Back to Eden", "file": "./asset/SleepToken/backtoeden.svg"},
+      {"type": "file", "id": "arcadia", "name": "Even in Arcadia", "file": "./asset/SleepToken/eveninarcadia.svg"},
+      {"type": "file", "id": "logo", "name": "Sleep Token", "file": "./asset/SleepToken/logo.svg"},
+      {"type": "file", "id": "cyclemustend", "name": "The Cycle Must End", "file": "./asset/SleepToken/thecyclemustend.svg"},
+      {"type": "file", "id": "vessel", "name": "Vessel", "file": "./asset/SleepToken/vessel.svg"}
     ]
   },
   {
