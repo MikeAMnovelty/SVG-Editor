@@ -172,20 +172,20 @@
   });
 
   // file input fallback
-  document.getElementById('file').addEventListener('change', e => {
-    const files = e.target.files;
-    if (!files) return;
-    let idx = 0;
-    for (const file of files) {
-      if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
-        const reader = new FileReader();
-        const targetIndex = Math.min(idx, rectangles.length - 1);
-        reader.onload = ev => insertSVGString(ev.target.result, targetIndex);
-        reader.readAsText(file);
-        idx++;
-      }
-    }
-  });
+  //document.getElementById('file').addEventListener('change', e => {
+    //const files = e.target.files;
+    //if (!files) return;
+    //let idx = 0;
+    //for (const file of files) {
+      //if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
+        //const reader = new FileReader();
+        //const targetIndex = Math.min(idx, rectangles.length - 1);
+        //reader.onload = ev => insertSVGString(ev.target.result, targetIndex);
+        //reader.readAsText(file);
+        //idx++;
+      //}
+    //}
+  //});
 
   // Export button: serializes SVG and triggers download
   document.getElementById('exportBtn').addEventListener('click', () => {
