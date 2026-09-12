@@ -14,7 +14,8 @@
       {"type": "file", "id": "Vampire", "name": "I'm a Vampire", "file": "./asset/Falling in Reverse/Vampire.svg"},
       {"type": "file", "id": "FIRSun", "name": "FIR Sun", "file": "./asset/Falling in Reverse/FIRJapanesSun.svg"},
       {"type": "file", "id": "RonnieR", "name": "Ronnie Silhouette", "file": "./asset/Falling in Reverse/RonnieR.svg"},
-      {"type": "file", "id": "Forever", "name": "Forever by your side", "file": "./asset/Falling in Reverse/foreverbyyourside.svg"}
+      {"type": "file", "id": "Forever", "name": "Forever by your side", "file": "./asset/Falling in Reverse/foreverbyyourside.svg"},
+      {"type": "file", "id": "ThornLogo", "name": "Thorned Logo", "file": "./asset/Falling in Reverse/ThornLogo.svg"}
     ]
   },
   {
