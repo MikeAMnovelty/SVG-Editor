@@ -34,7 +34,7 @@
     "name": "Bad Omens",
     "children": [
       {"type": "file", "id": "logo", "name": "Bad Omen Logo", "file": "./asset/Bad Omen/logo.svg"},
-      {"type": "file", "id": "Noah", "name": "Noah", "file": "./assett/Bad Omen/noah.svg"}
+      {"type": "file", "id": "Noah", "name": "Noah", "file": "./asset/Bad Omen/noah.svg"}
     ]
   },
   {
