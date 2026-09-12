@@ -6,6 +6,17 @@
   <title>AMNovelty Tumbler Designer</title>
   <link rel="stylesheet" href="./css/styles.css">
   <!link rel="stylesheet" href="./svgedit.css">
+  <style>
+    /* minimal helpers if your CSS doesn't provide them */
+    body { font-family: system-ui, sans-serif; margin: 12px; }
+    .topbar { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+    .layout { display:flex; gap:12px; }
+    .palette { width:220px; }
+    .workspace { flex:1; }
+    #svgwrap { display:block; border:1px solid #ccc; border-radius:12px; padding:8px; background:#fff; }
+    #svgwrap.dragover { outline:3px dashed #08f; }
+    input[type="file"] { margin-bottom:8px; }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -15,22 +26,184 @@
 
   <main class="layout">
     <aside class="palette">
-    <h2>Artwork</h2>
-  <div id="assetList"></div>
-</aside>
-
+      <h2>Artwork</h2>
+      <div id="assetList"></div>
+    </aside>
 
     <section class="workspace">
-      <svg id="canvas"
-         xmlns="http://www.w3.org/2000/svg"
-         width="100%"
-         height="600"
-         style="background:#fff; border-radius:12px; display:block;">
-        <!-- designs drop here -->
-      </svg>
+      <div id="svgwrap">
+        <input id="file" type="file" accept=".svg" multiple />
+        <svg id="canvas"
+             xmlns="http://www.w3.org/2000/svg"
+             width="100%"
+             height="600"
+             style="background:#fff; border-radius:12px; display:block;">
+          <!-- designs drop here -->
+        </svg>
+      </div>
     </section>
   </main>
 
-  <script type="module" src="./js/app.js"></script>
+<script>
+(function(){
+  const PPI = 96; // CSS pixels per inch for display (change if you need different DPI)
+  const rectangles = [
+    { id: 'r1', wIn: 12.375, hIn: 5.25, xIn: 0.5, yIn: 0.5 },
+    { id: 'r2', wIn: 10.125, hIn: 3,    xIn: 0.5, yIn: 6.5 }
+  ];
+  const fitMode = 'contain'; // 'contain' or 'cover'
+  const paddingIn = 0.125; // inside-rect padding
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('canvas');
+
+  // compute svg pixel size to contain both rects and set viewBox accordingly
+  const widthPx = Math.ceil(Math.max(...rectangles.map(r => r.xIn + r.wIn + 0.5)) * PPI);
+  const heightPx = Math.ceil(Math.max(...rectangles.map(r => r.yIn + r.hIn + 0.5)) * PPI);
+  svg.setAttribute('viewBox', `0 0 \${widthPx} \${heightPx}`);
+  svg.style.width = Math.min(widthPx, 1200) + 'px';
+  svg.style.height = (heightPx) + 'px';
+
+  // draw rectangles
+  for (const r of rectangles) {
+    const x = r.xIn * PPI;
+    const y = r.yIn * PPI;
+    const w = r.wIn * PPI;
+    const h = r.hIn * PPI;
+    const group = document.createElementNS(svgNS,'g');
+    group.dataset.rectId = r.id;
+
+    const rect = document.createElementNS(svgNS,'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', y);
+    rect.setAttribute('width', w);
+    rect.setAttribute('height', h);
+    rect.setAttribute('fill', 'none');
+    rect.setAttribute('stroke', '#000');
+    rect.setAttribute('stroke-width', 1);
+    rect.setAttribute('data-target', r.id);
+
+    const pad = paddingIn * PPI;
+    const inner = document.createElementNS(svgNS,'rect');
+    inner.setAttribute('x', x + pad);
+    inner.setAttribute('y', y + pad);
+    inner.setAttribute('width', Math.max(0, w - pad*2));
+    inner.setAttribute('height', Math.max(0, h - pad*2));
+    inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
+
+    group.appendChild(rect);
+    group.appendChild(inner);
+    svg.appendChild(group);
+  }
+
+  function computeFitTransform(imgW, imgH, boxX, boxY, boxW, boxH, mode) {
+    const pad = paddingIn * PPI;
+    const cw = boxW - pad*2, ch = boxH - pad*2;
+    const sx = cw / imgW, sy = ch / imgH;
+    let scale = (mode === 'cover') ? Math.max(sx, sy) : Math.min(sx, sy);
+    const sw = imgW * scale, sh = imgH * scale;
+    const tx = boxX + pad + (cw - sw)/2;
+    const ty = boxY + pad + (ch - sh)/2;
+    return { tx, ty, scale };
+  }
+
+  function insertSVGString(svgText, targetRectIndex) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const srcSvg = doc.documentElement;
+    let iw=0, ih=0;
+    const vb = srcSvg.getAttribute('viewBox');
+    if (vb) {
+      const parts = vb.trim().split(/\s+|,/).map(Number);
+      iw = parts[2]; ih = parts[3];
+    } else {
+      iw = parseFloat(srcSvg.getAttribute('width') || 0);
+      ih = parseFloat(srcSvg.getAttribute('height') || 0);
+    }
+    if (!iw || !ih) { iw = 100; ih = 100; }
+
+    const target = rectangles[targetRectIndex];
+    const boxX = target.xIn * PPI, boxY = target.yIn * PPI, boxW = target.wIn * PPI, boxH = target.hIn * PPI;
+    const fit = computeFitTransform(iw, ih, boxX, boxY, boxW, boxH, fitMode);
+
+    // Use <image> with data URL to keep SVG as vector content
+    const img = document.createElementNS(svgNS,'image');
+    const blob = new Blob([svgText], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    img.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
+    img.setAttribute('x', fit.tx);
+    img.setAttribute('y', fit.ty);
+    img.setAttribute('width', iw * fit.scale);
+    img.setAttribute('height', ih * fit.scale);
+    img.setAttribute('preserveAspectRatio', (fitMode === 'cover') ? 'xMidYMid slice' : 'xMidYMid meet');
+    img.dataset.targetRect = target.id;
+
+    svg.appendChild(img);
+    img.addEventListener('load', () => URL.revokeObjectURL(url));
+  }
+
+  // drag/drop handlers
+  const wrap = document.getElementById('svgwrap');
+  wrap.addEventListener('dragover', e => { e.preventDefault(); wrap.classList.add('dragover'); });
+  wrap.addEventListener('dragleave', e => wrap.classList.remove('dragover'));
+  wrap.addEventListener('drop', e => {
+    e.preventDefault();
+    wrap.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+
+    // map drop point to SVG coordinates
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const rectIndex = rectangles.findIndex(r => {
+      const x = r.xIn*PPI, y = r.yIn*PPI, w = r.wIn*PPI, h = r.hIn*PPI;
+      return svgPt.x >= x && svgPt.x <= x + w && svgPt.y >= y && svgPt.y <= y + h;
+    });
+    const targetIndex = rectIndex >= 0 ? rectIndex : 0;
+
+    for (const file of files) {
+      if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
+        const reader = new FileReader();
+        reader.onload = ev => insertSVGString(ev.target.result, targetIndex);
+        reader.readAsText(file);
+      }
+    }
+  });
+
+  // file input fallback
+  document.getElementById('file').addEventListener('change', e => {
+    const files = e.target.files;
+    if (!files) return;
+    let idx = 0;
+    for (const file of files) {
+      if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
+        const reader = new FileReader();
+        const targetIndex = Math.min(idx, rectangles.length - 1);
+        reader.onload = ev => insertSVGString(ev.target.result, targetIndex);
+        reader.readAsText(file);
+        idx++;
+      }
+    }
+  });
+
+  // Export button: serializes SVG and triggers download
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const clone = svg.cloneNode(true);
+    // remove interaction-only attributes if needed here
+    const serializer = new XMLSerializer();
+    const str = serializer.serializeToString(clone);
+    const blob = new Blob([str], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'engraving-layout.svg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
 </body>
 </html>
