@@ -77,7 +77,9 @@
       {"type": "file", "id": "anthrax", "name": "Anthrax", "file": "./asset/Misc Bands/anthrax.svg" },
       {"type": "file", "id": "ghost", "name": "Ghost", "file": "./asset/Misc Bands/ghostname.svg" },
       {"type": "file", "id": "emeritus", "name": "Papa Emeritus II", "file": "./asset/Misc Bands/papaemeritus.svg"},
-      {"type": "file", "id": "metalchurch", "name": "Metal Church", "file": "./asset/Misc Bands/metalchurch.svg"}
+      {"type": "file", "id": "metalchurch", "name": "Metal Church", "file": "./asset/Misc Bands/metalchurch.svg"},
+      {"type": "file", "id": "metallica", "name": "Metallica", "file": "./asset/Misc Bands/metallica.svg"},
+      {"type": "file", "id": "savatage", "name": "Savatage", "file": "./asset/Misc Bands/savatage.svg"}
     ]
   }
 ]
