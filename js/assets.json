@@ -79,7 +79,13 @@
       {"type": "file", "id": "emeritus", "name": "Papa Emeritus II", "file": "./asset/Misc Bands/papaemeritus.svg"},
       {"type": "file", "id": "metalchurch", "name": "Metal Church", "file": "./asset/Misc Bands/metalchurch.svg"},
       {"type": "file", "id": "metallica", "name": "Metallica", "file": "./asset/Misc Bands/metallica.svg"},
-      {"type": "file", "id": "savatage", "name": "Savatage", "file": "./asset/Misc Bands/savatage.svg"}
+      {"type": "file", "id": "savatage", "name": "Savatage", "file": "./asset/Misc Bands/savatage.svg"},
+      {"type": "file", "id": "helix", "name": "Helix", "file": "./asset/Misc Bands/helix.svg"},
+      {"type": "file", "id": "helloween", "name": "Helloween", "file": "./asset/Misc Bands/helloween.svg"},
+      {"type": "file", "id": "judaspriest", "name": "Judas Priest", "file": "./asset/Misc Bands/judaspriest.svg"},
+      {"type": "file", "id": "nightranger", "name": "Night Ranger", "file": "./asset/Misc Bands/nightranger.svg"},
+      {"type": "file", "id": "slayer", "name": "Slayer", "file": "./asset/Misc Bands/slayer.svg"},
+      {"type": "file", "id": "triumph", "name": "Triumph", "file": "./asset/Misc Bands/triumph.svg"}
     ]
   }
 ]
