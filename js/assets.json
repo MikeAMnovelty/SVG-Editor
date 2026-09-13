@@ -85,7 +85,33 @@
       {"type": "file", "id": "judaspriest", "name": "Judas Priest", "file": "./asset/Misc Bands/judaspriest.svg"},
       {"type": "file", "id": "nightranger", "name": "Night Ranger", "file": "./asset/Misc Bands/nightranger.svg"},
       {"type": "file", "id": "slayer", "name": "Slayer", "file": "./asset/Misc Bands/slayer.svg"},
-      {"type": "file", "id": "triumph", "name": "Triumph", "file": "./asset/Misc Bands/triumph.svg"}
+      {"type": "file", "id": "triumph", "name": "Triumph", "file": "./asset/Misc Bands/triumph.svg"},
+      {"type": "file", "id": "ledzepplin", "name": "Led Zepplin", "file": "./asset/Misc Bands,ledzepplin.svg"},
+      {"type": "file", "id": "foreigner", "name": "Foreigner", "file": "/asset/Misc Bands/foreigner.svg"}
     ]
+  },
+  {
+    "type": "folder",
+    "name": "K Pop",
+    "children": [
+
+    ]
+  },
+  {
+    "type": "folder",
+    "name": "Machine Gun Kelly",
+    "children": [
+
+    ]
+  },
+  {
+    "type": "folder",
+    "name": "Insane Clown Posse",
+    "children": []
+  },
+  {
+    "type": "folder",
+    "name": "Sabrina Carpenter",
+    "Children": []
   }
 ]
