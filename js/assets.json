@@ -95,6 +95,16 @@
   },
   {
     "type": "folder",
+    "name": "Misc Rock Stuff",
+    "children": [
+      {"type": "file", "id": "guitarplayer", "name": "Guitar Player", "file": "./asset/Misc Rock Items/guitarplayer.svg"},
+      {"type": "file", "id": "rockhorns", "name": "Rock N Roll Horns", "file": "./asset/Misc Rock Items/Rock Horns.svg"},
+      {"type": "file", "id": "rockmetal", "name": "Rock N Metal", "file": "./asset/Misc Rock Items/rockmetal.svg"},
+      {"type": "file", "id": "rocknroll", "name": "Rock N Roll Guitar", "file": "./asset/Misc Rock Items/rocknroll.svg"}
+    ]
+  }
+  {
+    "type": "folder",
     "name": "K Pop",
     "children": [
 
