@@ -87,7 +87,10 @@
       {"type": "file", "id": "slayer", "name": "Slayer", "file": "./asset/Misc Bands/slayer.svg"},
       {"type": "file", "id": "triumph", "name": "Triumph", "file": "./asset/Misc Bands/triumph.svg"},
       {"type": "file", "id": "ledzepplin", "name": "Led Zepplin", "file": "./asset/Misc Bands/ledzepplin.svg"},
-      {"type": "file", "id": "foreigner", "name": "Foreigner", "file": "/asset/Misc Bands/foreigner.svg"}
+      {"type": "file", "id": "foreigner", "name": "Foreigner", "file": "/asset/Misc Bands/foreigner.svg"},
+      {"type": "file", "id": "corrosionskull", "name": "Corrosion Skull", "file": "./asset/Misc Bands/corrosionskull.svg"},
+      {"type": "file", "id": "corrosion1", "name": "Corrosion of Conformity", "file": ".asset/Misc Bands/corrosionofconformity1.svg"},
+      {"type": "file", "id": "journey", "name": "Journey", "file": "./asset/Misc Bands/journey.svg"}
     ]
   },
   {
