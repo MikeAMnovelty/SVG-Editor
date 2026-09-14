@@ -102,7 +102,7 @@
       {"type": "file", "id": "rockmetal", "name": "Rock N Metal", "file": "./asset/Misc Rock Items/rockmetal.svg"},
       {"type": "file", "id": "rocknroll", "name": "Rock N Roll Guitar", "file": "./asset/Misc Rock Items/rocknroll.svg"}
     ]
-  }
+  },
   {
     "type": "folder",
     "name": "K Pop",
