@@ -10,8 +10,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #725f88;
-  color: #ea2dce;
+  background: #9b853d;
+  color: #5928ad;
 }
 .layout {
   display: grid;
@@ -20,7 +20,7 @@ body {
   padding: 16px;
 }
 .palette, .workspace {
-  background: #725f88;
+  background: #dfd7e8;
   border-radius: 12px;
   padding: 16px;
 }

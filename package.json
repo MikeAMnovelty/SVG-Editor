@@ -29,5 +29,12 @@
   },
   "dependencies": {
     "aws-amplify": "^6.20.0"
+  },
+  "allowScripts": {
+    "@aws-amplify/hosting@1.0.0": true,
+    "@parcel/watcher@2.6.0": true,
+    "core-js@2.6.12": true,
+    "esbuild@0.25.12": true,
+    "fsevents@2.3.3": true
   }
 }
