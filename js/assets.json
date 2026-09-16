@@ -107,7 +107,14 @@
     "type": "folder",
     "name": "K Pop",
     "children": [
-
+      {"type": "file", "id": "hunter", "name": "Huntraxx", "file": "./asset/K pop/hunter.svg"},
+      {"type": "file", "id": "huntraxx", "name": "Deamon Hunters", "file": "./asset/K pop/huntraxx.svg"},
+      {"type": "file", "id": "kpop", "name": "K Pop", "file": "./asset/K pop/kpop.svg"},
+      {"type": "file", "id": "sajaboys", "name": "Saja Boys", "file": "./asset/K pop/sajaboys.svg"},
+      {"type": "file", "id": "sajalogo", "name": "Saja Shield", "file": "./asset/K pop/sajalog.svg"},
+      {"type": "file", "id": "symbol1", "name": "Symbol 1", "file": "./asset/K pop/symbol1.svg"},
+      {"type": "file", "id": "symbol2", "name": "Symbol 2", "file": "./asset/K pop/symbol2.svg"},
+      {"type": "file", "id": "symbol3", "name": "Symbol 3", "file": "./asset/K pop/symbol3.svg"}
     ]
   },
   {
@@ -120,7 +127,15 @@
   {
     "type": "folder",
     "name": "Insane Clown Posse",
-    "children": []
+    "children": [
+      {"type": "file", "id": "insaneclown", "name": "ICP Logo", "file": "./asset/K pop/insaneclown.svg"},
+      {"type": "file", "id": "jokercard1", "name": "Joker Card 1", "file": "./asset/K pop/jokercard1.svg"},
+      {"type": "file", "id": "jokercard2", "name": "Joker Card 2", "file": "./asset/K pop/jokercard2.svg"},
+      {"type": "file", "id": "jokercard3", "name": "Joker Card 3", "file": "./asset/K pop/jokercard3.svg"},
+      {"type": "file", "id": "jokercard4", "name": "Joker Card 4", "file": "./asset/K pop/jokercard4.svg"},
+      {"type": "file", "id": "jokercard5", "name": "Joker Card 5", "file": "./asset/K pop/jokercard5.svg"},
+      {"type": "file", "id": "jokercard6", "name": "Joker Card 6", "file": "./asset/K pop/jokercard6.svg"}
+    ]
   },
   {
     "type": "folder",
