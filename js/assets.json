@@ -129,9 +129,9 @@
       {"type": "file", "id": "MGK", "name": "MGK", "file": "./asset/MGK/MGK.svg"},
       {"type": "file", "id": "mgkbanner", "name": "MGK Banner", "file": "./asset/MGK/mgkbanner.svg"},
       {"type": "file", "id": "mgklogo", "name": "MGK Logo", "file": "./asset/MGK/mgklogo.svg"},
-      {"type": "file", "id": "mgkrose", "name": "MGK Rose", "file": "./assett/MGK/mgkrose.svg"},
+      {"type": "file", "id": "mgkrose", "name": "MGK Rose", "file": "./asset/MGK/mgkrose.svg"},
       {"type": "file", "id": "mgkshadow", "name": "MGK Shadow", "file": "./asset/MGK/mgkshadow.svg"},
-      {"type": "file", "id": "sixteenthnote", "name": "Sixteenth Note", "file": "./asset/MGK/sixteenthnote.svg"}
+      {"type": "file", "id": "sixteenthnote", "name": "Sixteenth Note", "file": "./asset/MGK/sixteenthnotes.svg"}
     ]
   },
   {
@@ -156,6 +156,8 @@
   {
     "type": "folder",
     "name": "Sabrina Carpenter",
-    "Children": []
+    "Children": [
+
+    ]
   }
 ]
