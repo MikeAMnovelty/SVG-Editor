@@ -134,7 +134,13 @@
       {"type": "file", "id": "jokercard3", "name": "Joker Card 3", "file": "./asset/ICP/jokercard3.svg"},
       {"type": "file", "id": "jokercard4", "name": "Joker Card 4", "file": "./asset/ICP/jokercard4.svg"},
       {"type": "file", "id": "jokercard5", "name": "Joker Card 5", "file": "./asset/ICP/jokercard5.svg"},
-      {"type": "file", "id": "jokercard6", "name": "Joker Card 6", "file": "./asset/ICP/jokercard6.svg"}
+      {"type": "file", "id": "jokercard6", "name": "Joker Card 6", "file": "./asset/ICP/jokercard6.svg"},
+      {"type": "file", "id": "faygo", "name": "Faygo", "file": "./asset/ICP/faygo.svg"},
+      {"type": "file", "id": "hatchetman", "name": "Hatchet Man", "file": "./asset/ICP/hatchetman.svg"},
+      {"type": "file", "id": "icpmakeup1", "name": "Makeup 1", "file": "./asset/ICP/icpmakeup1.svg"},
+      {"type": "file", "id": "icpmakeup2", "name": "Makeup 2", "file": "./asset/ICP/icpmakeup2.svg"},
+      {"type": "file", "id": "juggalofamily", "name": "Juggalo Family", "file": "./asset/ICP/juggalofamily.svg"},
+      {"type": "file", "id": "juggalowarrior", "name": "Juggalo Warrior", "file": "./asset/ICP/juggalowarrior.svg"}
     ]
   },
   {
