@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="36mm"
+   height="41mm"
+   viewBox="0 0 36 41"
+   version="1.1"
+   id="svg1548"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   sodipodi:docname="MGK.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1550"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="3.3638608"
+     inkscape:cx="79.075804"
+     inkscape:cy="83.683605"
+     inkscape:window-width="1440"
+     inkscape:window-height="779"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1545" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path7981"
+       style="display:inline;fill:black;fill-opacity:1;stroke-width:0.0607985;stroke-linecap:round;paint-order:stroke fill markers"
+       d="m 18.9964,21.353851 -0.01064,18.126059 3.1879,-1.925904 0.02436,-5.752101 3.054289,-1.658945 1.452803,1.076457 -2.125454,1.328528 0.05092,3.612071 8.50042,-4.979709 -4.69165,-2.762614 6.308993,-3.71834 -0.04988,-3.879608 -12.484642,7.236619 -0.104406,-6.622174 z m 11.778659,-12.5905374 -6.49184,-0.028053 -2.048158,-1.2796863 -0.03881,9.1632107 9.273772,0.107025 -0.05609,-2.408133 -6.75682,-0.02928 -0.05264,-3.210761 10.134948,0.110727 0.09529,8.762485 -15.76561,-0.135029 -0.05591,-18.0594678 z M 4.8403527,32.195076 1.6686128,30.308565 1.6184153,10.911395 17.489401,1.816619 17.32943,39.539646 14.223374,37.78718 14.219677,7.4209107 11.098583,9.2133387 11.052276,35.766884 7.9465021,33.947542 7.9112848,11.005481 4.8564377,12.798201 Z" />
+  </g>
+</svg>
