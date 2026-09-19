@@ -1,0 +1,1 @@
+{ "resourceName": "amnoveltySvgUploads", "bucketName": "amnovelty-svg-uploads", "region": "us-east-2", "access": "private", "auth": { "allowUnauthenticatedIdentities": false } }
