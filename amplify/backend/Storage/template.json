@@ -1,0 +1,109 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Backend skeleton for AmnoveltySvgUploads: Lambda + HTTP API referencing existing S3 bucket",
+  "Parameters": {
+    "BucketName": {
+      "Type": "String",
+      "Default": "amnovelty-svg-uploads"
+    }
+  },
+  "Resources": {
+    "AmnoveltyLambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": { "Service": ["lambda.amazonaws.com"] },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"],
+        "Policies": [
+          {
+            "PolicyName": "S3AccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["s3:PutObject", "s3:GetObject", "s3:ListBucket"],
+                  "Resource": [{ "Fn::Sub": "arn:aws:s3:::${BucketName}" }, { "Fn::Sub": "arn:aws:s3:::${BucketName}/*" }]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AmnoveltyHandler": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": { "Fn::Sub": "amnovelty-svg-backend-handler-${AWS::Region}" },
+        "Runtime": "nodejs18.x",
+        "Handler": "index.handler",
+        "Role": { "Fn::GetAtt": ["AmnoveltyLambdaRole", "Arn"] },
+        "Timeout": 10,
+        "Environment": { "Variables": { "BUCKET_NAME": { "Ref": "BucketName" } } },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const s3 = new AWS.S3();",
+                "exports.handler = async (event) => {",
+                "  return { statusCode: 200, body: JSON.stringify({ message: 'backend ready', bucket: process.env.BUCKET_NAME }) };",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AmnoveltyHttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": { "Name": { "Fn::Sub": "amnovelty-svg-api-${AWS::Region}" }, "ProtocolType": "HTTP" }
+    },
+    "LambdaIntegration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": { "Ref": "AmnoveltyHttpApi" },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": { "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AmnoveltyHandler.Arn}/invocations" }
+      }
+    },
+    "DefaultRoute": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": { "Ref": "AmnoveltyHttpApi" },
+        "RouteKey": "GET /",
+        "Target": { "Fn::Join": ["", ["integrations/", { "Ref": "LambdaIntegration" }]] }
+      }
+    },
+    "Stage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": { "ApiId": { "Ref": "AmnoveltyHttpApi" }, "StageName": "$default", "AutoDeploy": true }
+    },
+    "PermissionForApiToInvokeLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Ref": "AmnoveltyHandler" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": { "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${AmnoveltyHttpApi}/*/*" }
+      }
+    }
+  },
+  "Outputs": {
+    "ApiEndpoint": {
+      "Value": { "Fn::Sub": "https://${AmnoveltyHttpApi}.execute-api.${AWS::Region}.amazonaws.com/" },
+      "Export": { "Name": { "Fn::Sub": "${AWS::StackName}-ApiEndpoint" } }
+    },
+    "LambdaFunctionName": { "Value": { "Ref": "AmnoveltyHandler" } }
+  }
+}
