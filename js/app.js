@@ -1,4 +1,4 @@
-import { uploadSVGToS3 } from 'lib/s3Upload.js';
+import { uploadSVGToS3 } from './js/lib/s3Upload.js';
 
 async function loadAssets() {
   const res = await fetch('./assets.json');
