@@ -58,9 +58,19 @@
   const svg = document.getElementById('canvas');
 
   // compute svg pixel size to contain both rects and set viewBox accordingly
+  //const widthPx = Math.ceil(Math.max(...rectangles.map(r => r.xIn + r.wIn + 0.5)) * PPI);
+  //const heightPx = Math.ceil(Math.max(...rectangles.map(r => r.yIn + r.hIn + 0.5)) * PPI);
+  //svg.setAttribute('viewBox', `0 0 \${widthPx} \${heightPx}`);
+  //svg.style.width = Math.min(widthPx, 1200) + 'px';
+  //svg.style.height = (heightPx) + 'px';
+  // 1. Calculate the values
   const widthPx = Math.ceil(Math.max(...rectangles.map(r => r.xIn + r.wIn + 0.5)) * PPI);
   const heightPx = Math.ceil(Math.max(...rectangles.map(r => r.yIn + r.hIn + 0.5)) * PPI);
-  svg.setAttribute('viewBox', `0 0 \${widthPx} \${heightPx}`);
+
+  // 2. Apply them to the SVG (This MUST stay right below the lines above)
+  svg.setAttribute('viewBox', '0 0 ' + widthPx + ' ' + heightPx);
+  
+  // 3. Set the display size
   svg.style.width = Math.min(widthPx, 1200) + 'px';
   svg.style.height = (heightPx) + 'px';
 
