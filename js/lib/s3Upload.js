@@ -2,17 +2,17 @@ import { S3Client, PutObjectCommand } from "https://cdn.skypack.dev/@aws-sdk/cli
 import outputs from "../../amplify_outputs.json" with { type: "json" };
 
 // We will fetch the config inside the function to avoid "Import Attribute" errors
-export const uploadSVGToS3 = async (file) => {
-  const responseConfig = await fetch('/amplify_outputs.json');
-  const outputs = await responseConfig.json();
+//export const uploadSVGToS3 = async (file) => {
+  //const responseConfig = await fetch('/amplify_outputs.json');
+  //const outputs = await responseConfig.json();
 
-  const s3Client = new S3Client({
-    region: outputs.storage.aws_region,
-    credentials: {
-      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
-    },
-  });
+  //const s3Client = new S3Client({
+    //region: outputs.storage.aws_region,
+    //credentials: {
+      //accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+      //secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+    //},
+  //});
   
   // ... rest of your existing code
 
