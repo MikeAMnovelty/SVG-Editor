@@ -1,5 +1,6 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import outputs from "../../amplify_outputs.json";
+import { S3Client, PutObjectCommand } from "https://cdn.skypack.dev/@aws-sdk/client-s3";
+import outputs from "../../amplify_outputs.json" with { type: "json" };
+
 
 // This uses the configuration Amplify already generated for you
 const s3Client = new S3Client({
