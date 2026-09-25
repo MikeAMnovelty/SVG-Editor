@@ -18,14 +18,14 @@ export const uploadSVGToS3 = async (file) => {
 
 
 // This uses the configuration Amplify already generated for you
-const s3Client = new S3Client({
-  region: outputs.storage.aws_region,
+//const s3Client = new S3Client({
+  //region: outputs.storage.aws_region,
   // We will handle credentials in the next step to keep them off GitHub
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
-  },
-});
+  //credentials: {
+    //accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+    //secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+  //},
+//});
 
 export const uploadSVGToS3 = async (file) => {
   const params = {
