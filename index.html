@@ -60,7 +60,7 @@
   // compute svg pixel size to contain both rects and set viewBox accordingly
   const widthPx = Math.ceil(Math.max(...rectangles.map(r => r.xIn + r.wIn + 0.5)) * PPI);
   const heightPx = Math.ceil(Math.max(...rectangles.map(r => r.yIn + r.hIn + 0.5)) * PPI);
-  svg.setAttribute('viewBox', 0 0 `\${widthPx} \${heightPx}`);
+  svg.setAttribute('viewBox', `0 0 \${widthPx} \${heightPx}`);
   svg.style.width = Math.min(widthPx, 1200) + 'px';
   svg.style.height = (heightPx) + 'px';
 
