@@ -1,5 +1,5 @@
 import { S3Client, PutObjectCommand } from "https://cdn.skypack.dev/@aws-sdk/client-s3";
-import outputs from "/../../amplify_outputs.json" with { type: "json" };
+import outputs from "amplify_outputs.json" with { type: "json" };
 
 // We will fetch the config inside the function to avoid "Import Attribute" errors
 //export const uploadSVGToS3 = async (file) => {
