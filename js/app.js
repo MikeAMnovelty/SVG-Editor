@@ -1,5 +1,4 @@
-import { uploadSVGToS3 } from './js/lib/s3Upload.js';
-
+import { uploadSVGToS3 } from './lib/s3Upload.js';
 
 async function loadAssets() {
   const res = await fetch('./js/assets.json');
@@ -343,34 +342,39 @@ function updateControlsPosition(el) {
 document.getElementById('exportBtn').addEventListener('click', async () => {
   selectItem(null);
 
-  // 1. Prepare the SVG data (Your original logic)
+  // 1. Capture current view and hide the grid/controls for export
   const currentTransform = viewport.getAttribute('transform');
   viewport.removeAttribute('transform');
 
-  const serializer = new XMLSerializer();
-  const svgData = serializer.serializeToString(canvas);
-  const blob = new Blob([svgData], { type: 'image/svg+xml' });
-
-  // 2. NEW: Upload to S3 Cloud
   try {
+    // 2. Prepare the SVG data
+    const serializer = new XMLSerializer();
+    const svgData = serializer.serializeToString(canvas);
+    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+
+    // 3. Trigger Local Download immediately (so the user gets their file)
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'tumbler-design.svg';
+    link.click();
+    URL.revokeObjectURL(url);
+
+    // 4. Attempt Cloud Upload
+    console.log("Attempting cloud upload...");
     const fileForS3 = new File([blob], "tumbler-design.svg", { type: 'image/svg+xml' });
     await uploadSVGToS3(fileForS3);
     console.log("Cloud upload successful!");
+
   } catch (error) {
-    console.error("Cloud upload failed:", error);
-    // We don't stop here; we still let them download the file locally below
+    console.error("Operation failed:", error);
+  } finally {
+    // 5. ALWAYS restore the editor view, even if an error happened above
+    if (currentTransform) {
+      viewport.setAttribute('transform', currentTransform);
+    }
+    console.log("Editor view restored.");
   }
-
-  // 3. Save locally to user's computer (Your original logic)
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'tumbler-design.svg';
-  link.click();
-
-  URL.revokeObjectURL(url);
-
-  // 4. Restore editor view (Your original logic)
-  if (currentTransform) viewport.setAttribute('transform', currentTransform);
 });
+
 
