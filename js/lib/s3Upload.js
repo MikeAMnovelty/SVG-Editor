@@ -2,7 +2,7 @@ import { S3Client, PutObjectCommand } from "https://cdn.skypack.dev/@aws-sdk/cli
 
 export const uploadSVGToS3 = async (file) => {
   // 1. Fetch the configuration
-  const responseConfig = await fetch('../../amplify_outputs.json');
+  const responseConfig = await fetch('/amplify_outputs.json');
   const outputs = await responseConfig.json();
 
   // 2. Initialize the S3 Client inside the function
