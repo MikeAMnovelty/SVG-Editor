@@ -1,10 +1,12 @@
 import { S3Client, PutObjectCommand } from "https://cdn.skypack.dev/@aws-sdk/client-s3";
-// Vite handles this import automatically and bundles the data
-import outputs from "../../amplify_outputs.json";
 
 export const uploadSVGToS3 = async (file) => {
+  // 1. Manually define your bucket info here
+  const region = "us-east-2"; // Taken from your JSON 'auth' section
+  const bucketName = "amnovelty-svg-uploads"; 
+
   const s3Client = new S3Client({
-    region: outputs.storage.aws_region,
+    region: region,
     credentials: {
       accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
       secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
@@ -12,7 +14,7 @@ export const uploadSVGToS3 = async (file) => {
   });
 
   const params = {
-    Bucket: outputs.storage.bucket_name,
+    Bucket: bucketName,
     Key: `uploads/${Date.now()}-${file.name}`,
     Body: file,
     ContentType: "image/svg+xml",
