@@ -1,3 +1,6 @@
+import { uploadSVGToS3 } from './js/lib/s3Upload.js';
+
+
 async function loadAssets() {
   const res = await fetch('./js/assets.json');
   const data = await res.json();
@@ -336,19 +339,30 @@ function updateControlsPosition(el) {
   resizeHandle.setAttribute('y', top + height - 6);
 }
 
-// ─── Export SVG ─────────────────────────────────────────────────────────────
-document.getElementById('exportBtn').addEventListener('click', () => {
+// ─── Export SVG & Upload to S3 ──────────────────────────────────────────────
+document.getElementById('exportBtn').addEventListener('click', async () => {
   selectItem(null);
 
-  // Temporarily reset viewport pan/zoom so export reflects the clean base art
+  // 1. Prepare the SVG data (Your original logic)
   const currentTransform = viewport.getAttribute('transform');
   viewport.removeAttribute('transform');
 
   const serializer = new XMLSerializer();
   const svgData = serializer.serializeToString(canvas);
   const blob = new Blob([svgData], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
 
+  // 2. NEW: Upload to S3 Cloud
+  try {
+    const fileForS3 = new File([blob], "tumbler-design.svg", { type: 'image/svg+xml' });
+    await uploadSVGToS3(fileForS3);
+    console.log("Cloud upload successful!");
+  } catch (error) {
+    console.error("Cloud upload failed:", error);
+    // We don't stop here; we still let them download the file locally below
+  }
+
+  // 3. Save locally to user's computer (Your original logic)
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = 'tumbler-design.svg';
@@ -356,6 +370,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 
   URL.revokeObjectURL(url);
 
-  // Restore editor view
+  // 4. Restore editor view (Your original logic)
   if (currentTransform) viewport.setAttribute('transform', currentTransform);
 });
+
