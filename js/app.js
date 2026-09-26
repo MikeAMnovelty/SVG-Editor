@@ -353,18 +353,21 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     const blob = new Blob([svgData], { type: 'image/svg+xml' });
 
     // 3. Trigger Local Download immediately (so the user gets their file)
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'tumbler-design.svg';
-    link.click();
-    URL.revokeObjectURL(url);
+    // const url = URL.createObjectURL(blob);
+    // const link = document.createElement('a');
+    // link.href = url;
+    // link.download = 'tumbler-design.svg';
+    // link.click();
+    // URL.revokeObjectURL(url);
 
     // 4. Attempt Cloud Upload
-    console.log("Attempting cloud upload...");
-    const fileForS3 = new File([blob], "tumbler-design.svg", { type: 'image/svg+xml' });
-    await uploadSVGToS3(fileForS3);
-    console.log("Cloud upload successful!");
+    const fileName = prompt("Enter a name for your design:", "tumbler-design");
+    if (fileName) {
+      console.log("Attempting cloud upload...");
+      const fileForS3 = new File([blob], `${fileName}.svg`, { type: 'image/svg+xml' });
+      await uploadSVGToS3(fileForS3);
+      console.log("Cloud upload successful!");
+    }
 
   } catch (error) {
     console.error("Operation failed:", error);
@@ -376,5 +379,6 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     console.log("Editor view restored.");
   }
 });
+
 
 
