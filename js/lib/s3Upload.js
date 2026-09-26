@@ -12,7 +12,7 @@ export const uploadSVGToS3 = async (file) => {
   const params = {
     Bucket: "amnovelty-svg-uploads",
     Key: `uploads/${Date.now()}-${file.name}`,
-    Body: file,
+    Body: await file.arrayBuffer(),
     ContentType: "image/svg+xml",
   };
 
