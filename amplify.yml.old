@@ -3,7 +3,9 @@ frontend:
   phases:
     build:
       commands:
-        - echo "No build required"
+        # This replaces the code text with your actual environment variables
+        - sed -i "s|import.meta.env.VITE_AWS_ACCESS_KEY_ID|\"$VITE_AWS_ACCESS_KEY_ID\"|g" js/lib/s3Upload.js
+        - sed -i "s|import.meta.env.VITE_AWS_SECRET_ACCESS_KEY|\"$VITE_AWS_SECRET_ACCESS_KEY\"|g" js/lib/s3Upload.js
   artifacts:
     baseDirectory: /
     files:

@@ -1,14 +1,16 @@
 version: 1
 frontend:
   phases:
+    preBuild:
+      commands:
+        - npm install
     build:
       commands:
-        # This replaces the code text with your actual environment variables
-        - sed -i "s|import.meta.env.VITE_AWS_ACCESS_KEY_ID|\"$VITE_AWS_ACCESS_KEY_ID\"|g" js/lib/s3Upload.js
-        - sed -i "s|import.meta.env.VITE_AWS_SECRET_ACCESS_KEY|\"$VITE_AWS_SECRET_ACCESS_KEY\"|g" js/lib/s3Upload.js
+        - npm run build
   artifacts:
-    baseDirectory: /
+    baseDirectory: dist
     files:
       - '**/*'
   cache:
-    paths: []
+    paths:
+      - node_modules/**/*
