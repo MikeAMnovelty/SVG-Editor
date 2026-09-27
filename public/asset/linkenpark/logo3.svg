@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50mm"
+   height="50mm"
+   viewBox="0 0 50 50"
+   version="1.1"
+   id="svg2934"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   sodipodi:docname="logo3.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview2936"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.1893044"
+     inkscape:cx="94.172695"
+     inkscape:cy="125.28332"
+     inkscape:window-width="1440"
+     inkscape:window-height="782"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2931" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path643"
+       style="fill:black;fill-opacity:1;stroke-width:0.563035;stroke-linecap:round;stroke-dashoffset:0.096;paint-order:stroke fill markers"
+       d="M 22.856426,2.0601723 C 14.246197,3.7589753 6.2037561,7.8405223 2.5225562,20.848443 0.65975609,29.252589 5.7433714,41.769685 16.323482,45.661506 L 21.662792,34.316367 40.305219,33.938974 28.894644,12.682597 19.753896,31.684163 14.892084,31.69829 27.901201,5.0400473 C 36.68129,5.6381513 47.885081,16.211556 45.010586,28.531997 41.623796,42.530946 30.131537,46.600742 20.162124,44.198523 l -1.090647,2.482689 C 29.062266,49.706084 43.690442,44.962063 47.690539,29.486322 50.97021,13.454848 37.893506,2.3938653 26.18556,2.0046573 l -15.578465,32.3630457 7.72725,0.07068 -3.604176,7.519683 C -0.30684419,31.845576 3.1942837,9.5617653 21.442436,5.1477543 Z m 6.171945,16.6479747 6.771698,12.675175 -12.817908,0.180052 z" />
+  </g>
+</svg>

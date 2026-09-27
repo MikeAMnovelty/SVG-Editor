@@ -188,5 +188,19 @@
       {"type": "file", "id": "rip", "name": "RIP", "file": "/asset/pantera/rip.svg"},
       {"type": "file", "id": "vinnieanddime", "name": "Vinnie and Dime", "file": "/asset/pantera/vinnieanddime.svg"}
     ]
+  },
+  {
+    "type": "folder",
+    "name": "Linken Park",
+    "children": [
+      {"type": "file", "id": "chester", "name": "Chester Bennington", "file": "/asset/linkenpark/chester.svg"},
+      {"type": "file", "id": "faint", "name": "Faint", "file": "/asset/linkenpark/faint.svg"},
+      {"type": "file", "id": "intheend", "name": "In the End", "file": "/asset/linkenpark/intheend.svg"},
+      {"type": "file", "id": "linkenpark", "name": "Linken Park", "file": "/asset/linkenpark/linkenpark.svg"},
+      {"type": "file", "id": "logo", "name": "Logo 1", "file": "/asset/linkenpark/logo.svg"},
+      {"type": "file", "id": "logo2", "name": "Logo 2", "file": "/asset/linkenpark/logo2.svg"},
+      {"type": "file", "id": "logo3", "name": "Logo 3", "file": "/asset,linkenpark/logo3.svg"},
+      {"type": "file", "id": "ripchester", "name": "RIP Chester", "file": "/asset/linkenpark/ripchester.svg"}
+    ]
   }
 ]
