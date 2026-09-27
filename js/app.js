@@ -207,6 +207,24 @@ function selectItem(el) {
   renderControls(el);
 }
 
+function deleteSelected() {
+  if (!activeItem) return;
+  activeItem.remove();
+  selectItem(null);
+}
+
+// Delete key listener
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Delete' || e.key === 'Backspace') && activeItem) {
+    e.preventDefault();
+    deleteSelected();
+  }
+});
+
+// Delete button
+document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
+
+
 // ─── Transform & Interaction Controls ────────────────────────────────────────
 function attachTransformControls(el) {
   updateTransform(el);
