@@ -175,5 +175,18 @@
       {"type": "file", "id": "shortnsweet", "name": "Short N Sweet", "file": "/asset/sabrinacarpenter/shortnsweet.svg"},
       {"type": "file", "id": "sweettooth", "name": "Sweet Tooth", "file": "/asset/sabrinacarpenter/sweettooth.svg"}
     ]
+  },
+  {
+    "type": "folder",
+    "name": "Pantera",
+    "children": [
+      {"type": "file", "id": "cowboyfromhell", "name": "Cowboy from Hell", "file": "/asset/pantera/cowboyfromhell.svg"},
+      {"type": "file", "id": "dime1", "name": "Dimebag 1", "file": "/asset/pantera/dime1.svg"},
+      {"type": "file", "id": "dime2", "name": "Dimebag 2", "file": "/asset/pantera/dime2.svg"},
+      {"type": "file", "id": "guitar", "name": "Guitar", "file": "/asset/pantera/guitar.svg"},
+      {"type": "file", "id": "pantera", "name": "Pantera Name", "file": "/asset/pantera/pantera.svg"},
+      {"type": "file", "id": "rip", "name": "RIP", "file": "/asset/pantera/rip.svg"},
+      {"type": "file", "id": "vinnieanddime", "name": "Vinnie and Dime", "file": "/asset/pantera/vinnieanddime.svg"}
+    ]
   }
 ]
