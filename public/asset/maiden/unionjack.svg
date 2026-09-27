@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="75mm"
+   height="50mm"
+   viewBox="0 0 75 50"
+   version="1.1"
+   id="svg1132"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   sodipodi:docname="unionjack.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1134"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.1893044"
+     inkscape:cx="126.12414"
+     inkscape:cy="107.62594"
+     inkscape:window-width="1440"
+     inkscape:window-height="778"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1129" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path9276"
+       style="fill:#040404;fill-opacity:1;stroke:#9a14b5;stroke-width:0.0979121;stroke-linecap:round;paint-order:stroke fill markers"
+       d="m 1.0774443,28.913473 0.052647,-9.317339 32.1743017,0.05268 -0.05266,-18.2661942 7.108896,0.052481 0.157973,18.1609182 h 32.964201 v 9.212054 L 40.571279,28.9133 V 47.442702 L 33.30441,47.390022 33.25176,28.965905 Z M 1.1082866,4.9280816 1.1301015,1.5931382 24.615767,16.385079 19.244598,16.490296 Z M 1.182749,6.8571702 1.1300917,16.543002 16.401024,16.490325 Z M 1.0247762,41.81034 16.506349,31.966605 1.1300966,31.913928 Z M 5.922013,47.495503 0.81413646,47.390277 24.721067,31.966673 30.09222,31.913997 Z M 8.9761869,47.179667 H 30.829446 L 30.724141,33.387891 Z m 55.9232551,0.105227 -21.853239,0.05268 V 33.335243 Z m 8.635981,-3.211055 v 3.368977 L 49.154581,31.966566 h 5.423807 z M 73.5881,32.071841 V 42.231422 L 57.369255,31.913928 Z M 73.640777,6.3307151 73.535472,16.437668 H 57.527273 Z M 44.046755,16.38503 67.427083,1.4878138 72.745594,1.435137 49.101963,16.542914 Z M 43.046237,1.5404515 64.583545,1.4879705 43.098904,15.174461 Z M 9.4501688,1.4879705 30.724174,1.4352936 V 15.069147 Z" />
+  </g>
+</svg>

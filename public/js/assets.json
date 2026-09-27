@@ -202,5 +202,36 @@
       {"type": "file", "id": "logo3", "name": "Logo 3", "file": "/asset/linkenpark/logo3.svg"},
       {"type": "file", "id": "ripchester", "name": "RIP Chester", "file": "/asset/linkenpark/ripchester.svg"}
     ]
+  },
+  {
+    "type": "folder",
+    "name": "Iron Maiden",
+    "children": [
+      {"type": "file", "id": "aceshigh", "name": "Aces High", "file": "/asset/maiden/aceshigh.svg"},
+      {"type": "file", "id": "aceshigheddie", "name": "Ace Eddie", "file": "/asset/maiden/aceshigheddie.svg"},
+      {"type": "file", "id": "ironmaiden", "name": "Iron Maiden", "file": "/asset/maiden/irinmaiden.svg"},
+      {"type": "file", "id": "killer", "name": "Killer", "file": "/asset/maiden/killer.svg"},
+      {"type": "file", "id": "killereddie", "name": "Eddie Killers", "file": "/asset/maiden/killereddie.svg"},
+      {"type": "file", "id": "powerslave", "name": "Powerslave", "file": "/asset/maiden/powerslave.svg"},
+      {"type": "file", "id": "powerslaveeddie", "name": "Mummy Eddie", "file": "/asset/maiden/powerslaveeddie.svg"},
+      {"type": "file", "id": "unionjack", "name": "Union Jack", "file": "/asset/maiden/unionjack.svg"}
+    ]
+  },
+  {
+    "type": "folder",
+    "name": "Motionless In White",
+    "children": [
+      {"type": "file", "id": "bullseye", "name": "Spiral Bullseye", "file": "/asset/miw/bullseye.svg"},
+      {"type": "file", "id": "logo", "name": "Logo", "file": "/asset/miw/logo.svg"},
+      {"type": "file", "id": "miwpumpkin", "name": "MIW Pumpkin", "file": "/asset/miw/miwpumpkin.svg"},
+      {"type": "file", "id": "puppetmaster", "name": "Puppet Master", "file": "/asset/miw/puppetmaster.svg"}
+    ]
+  },
+  {
+    "type": "folder",
+    "name": "Prince",
+    "children": [
+      {"type": "file", "id": "something", "name": "Prince Portrait", "file": "/asset/prince/"}
+    ]
   }
 ]
