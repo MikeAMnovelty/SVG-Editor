@@ -169,11 +169,11 @@
       {"type": "file", "id": "lips", "name": "Lips", "file": "/asset/sabrinacarpenter/lips.svg"},
       {"type": "file", "id": "logo", "name": "Logo", "file": "/asset/sabrinacarpenter/logo.svg"},
       {"type": "file", "id": "martini", "name": "Martini", "file": "/asset/sabrinacarpenter/martini.svg"},
-      {"type": "file", "id": "mic", "name": "Mic", "file": "/asset,sabrinacarpenter/mic.svg"},
+      {"type": "file", "id": "mic", "name": "Mic", "file": "/asset/sabrinacarpenter/mic.svg"},
       {"type": "file", "id": "sabrina", "name": "Sabrina", "file": "/asset/sabrinacarpenter/sabrina.svg"},
       {"type": "file", "id": "scribbleheart", "name": "Scribble Heart", "file": "/asset/sabrinacarpenter/scribbleheart.svg"},
       {"type": "file", "id": "shortnsweet", "name": "Short N Sweet", "file": "/asset/sabrinacarpenter/shortnsweet.svg"},
-      {"type": "file", "id": "sweettooth", "name": "Sweet Tooth", "file": "/asset/sabringcarpenter/sweettooth.svg"}
+      {"type": "file", "id": "sweettooth", "name": "Sweet Tooth", "file": "/asset/sabrinacarpenter/sweettooth.svg"}
     ]
   }
 ]
