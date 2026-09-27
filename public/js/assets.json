@@ -156,7 +156,7 @@
   {
     "type": "folder",
     "name": "Sabrina Carpenter",
-    "Children": [
+    "children": [
       {"type": "file", "id": "autograph", "name": "Autograph", "file": "/asset/sabrinacarpenter/autograph.svg"},
       {"type": "file", "id": "bow", "name": "Bow", "file": "/asset/sabrinacarpenter/bow.svg"},
       {"type": "file", "id": "candyheart", "name": "Candy Heart", "file": "/asset/sabrinacarpenter/candyheart.svg"},
