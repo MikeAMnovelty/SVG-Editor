@@ -199,7 +199,7 @@
       {"type": "file", "id": "linkenpark", "name": "Linken Park", "file": "/asset/linkenpark/linkenpark.svg"},
       {"type": "file", "id": "logo", "name": "Logo 1", "file": "/asset/linkenpark/logo.svg"},
       {"type": "file", "id": "logo2", "name": "Logo 2", "file": "/asset/linkenpark/logo2.svg"},
-      {"type": "file", "id": "logo3", "name": "Logo 3", "file": "/asset,linkenpark/logo3.svg"},
+      {"type": "file", "id": "logo3", "name": "Logo 3", "file": "/asset/linkenpark/logo3.svg"},
       {"type": "file", "id": "ripchester", "name": "RIP Chester", "file": "/asset/linkenpark/ripchester.svg"}
     ]
   }
