@@ -157,7 +157,23 @@
     "type": "folder",
     "name": "Sabrina Carpenter",
     "Children": [
-
+      {"type": "file", "id": "autograph", "name": "Autograph", "file": "/asset/sabrinacarpenter/autograph.svg"},
+      {"type": "file", "id": "bow", "name": "Bow", "file": "/asset/sabrinacarpenter/bow.svg"},
+      {"type": "file", "id": "candyheart", "name": "Candy Heart", "file": "/asset/sabrinacarpenter/candyheart.svg"},
+      {"type": "file", "id": "cherries", "name": "Cherries", "file": "/asset/sabrinacarpenter/cherries.svg"},
+      {"type": "file", "id": "diamond", "name": "Diamond", "file": "/asset/sabrinacarpenter/diamond.svg"},
+      {"type": "file", "id": "envelope", "name": "Envelope", "file": "/asset/sabrinacarpenter/envelope.svg"},
+      {"type": "file", "id": "heart1", "name": "Heart", "file": "/asset/sabrinacarpenter/heart1.svg"},
+      {"type": "file", "id": "heartlolli", "name": "Heart Lollipop", "file": "/asset/sabrinacarpenter/heartlolli.svg"},
+      {"type": "file", "id": "heartsucker", "name": "Heart Sucker", "file": "/asset/sabrinacarpenter/heartsucker.svg"},
+      {"type": "file", "id": "lips", "name": "Lips", "file": "/asset/sabrinacarpenter/lips.svg"},
+      {"type": "file", "id": "logo", "name": "Logo", "file": "/asset/sabrinacarpenter/logo.svg"},
+      {"type": "file", "id": "martini", "name": "Martini", "file": "/asset/sabrinacarpenter/martini.svg"},
+      {"type": "file", "id": "mic", "name": "Mic", "file": "/asset,sabrinacarpenter/mic.svg"},
+      {"type": "file", "id": "sabrina", "name": "Sabrina", "file": "/asset/sabrinacarpenter/sabrina.svg"},
+      {"type": "file", "id": "scribbleheart", "name": "Scribble Heart", "file": "/asset/sabrinacarpenter/scribbleheart.svg"},
+      {"type": "file", "id": "shortnsweet", "name": "Short N Sweet", "file": "/asset/sabrinacarpenter/shortnsweet.svg"},
+      {"type": "file", "id": "sweettooth", "name": "Sweet Tooth", "file": "/asset/sabringcarpenter/sweettooth.svg"}
     ]
   }
 ]

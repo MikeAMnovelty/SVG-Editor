@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="60mm"
+   height="51mm"
+   viewBox="0 0 60 51"
+   version="1.1"
+   id="svg1963"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   sodipodi:docname="candyheart.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1965"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.6819304"
+     inkscape:cx="101.07434"
+     inkscape:cy="129.91025"
+     inkscape:window-width="1440"
+     inkscape:window-height="783"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1960" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path16268"
+       style="fill:black;fill-opacity:1;stroke-width:0.9651;stroke-linecap:round;paint-order:stroke fill markers"
+       d="M 18.751202,3.8062952 C 8.4066744,5.3404061 -0.52383861,8.3012603 2.0903201,22.910791 4.2483455,35.978764 15.886421,42.873674 28.036874,49.434951 L 37.500273,48.05765 C 26.571555,41.650134 15.617114,35.257094 12.086841,24.687952 9.6643447,17.597333 9.5084847,8.1876138 18.751202,3.8062952 Z M 38.381962,47.510583 C 51.270156,39.497884 59.706473,25.319372 58.111264,12.952882 55.239568,0.81141637 42.379008,-2.6412781 33.732382,9.057287 L 33.229722,8.4289654 C 35.910773,4.5967093 38.964604,3.1027983 41.586409,1.8944179 37.86399,2.2014364 32.656694,2.2165303 28.391643,4.9103571 19.903889,1.5266161 14.67539,5.8621304 12.243775,11.696238 7.6696455,27.022621 22.392709,39.7494 38.381962,47.510583 Z" />
+  </g>
+</svg>
