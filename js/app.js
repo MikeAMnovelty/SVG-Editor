@@ -55,15 +55,8 @@ function renderNodes(nodes) {
 
 loadAssets();
 
-// ─── Canvas & Viewport Setup ─────────────────────────────────────────────────
+// ─── Canvas & Viewport Setup ──────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
-
-//let viewport = canvas.querySelector('#viewport');
-//if (!viewport) {
-  //viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  //viewport.setAttribute('id', 'viewport');
-  //canvas.appendChild(viewport);
-//}
 const viewport = canvas.querySelector('#viewport');
 
 let activeItem = null;
@@ -89,7 +82,7 @@ function clientToViewport(clientX, clientY) {
   return pt.matrixTransform(viewport.getScreenCTM().inverse());
 }
 
-// ─── Zoom & Pan ──────────────────────────────────────────────────────────────
+// ─── Zoom & Pan ───────────────────────────────────────────────────────────────
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   const zoomFactor = 1.1;
@@ -132,7 +125,7 @@ window.addEventListener('mouseup', () => {
   }
 });
 
-// ─── Canvas Drop Zone ────────────────────────────────────────────────────────
+// ─── Canvas Drop Zone ─────────────────────────────────────────────────────────
 canvas.addEventListener('dragover', e => {
   e.preventDefault();
   canvas.style.outline = '2px dashed #aac';
@@ -165,23 +158,29 @@ canvas.addEventListener('drop', async e => {
     group.dataset.rotation = 0;
 
     viewport.appendChild(group);
-    attachTransformControls(group);
-    selectItem(group);
-    setTimeout(() => { if (window.checkArtworkBounds) window.checkArtworkBounds(); }, 50);
+    setTimeout(() => {
+      attachTransformControls(group);
+      selectItem(group);
+      setTimeout(() => { if (window.checkArtworkBounds) window.checkArtworkBounds(); }, 50);
+    }, 0);
 
   } catch (err) {
     console.error('Could not load SVG:', file, err);
   }
 });
 
-// ─── Transform Engine ────────────────────────────────────────────────────────
+// ─── Transform Engine ─────────────────────────────────────────────────────────
 function updateTransform(el) {
-  const x   = parseFloat(el.dataset.x)        || 0;
-  const y   = parseFloat(el.dataset.y)        || 0;
-  const scale = parseFloat(el.dataset.scale)  || 1;
-  const rot = parseFloat(el.dataset.rotation) || 0;
+  const x     = parseFloat(el.dataset.x)        || 0;
+  const y     = parseFloat(el.dataset.y)        || 0;
+  const scale = parseFloat(el.dataset.scale)    || 1;
+  const rot   = parseFloat(el.dataset.rotation) || 0;
 
-  const bbox = el.querySelector('svg')?.getBBox?.() || { width: 80, height: 80, x: 0, y: 0 };
+  const rawBbox = el.querySelector('svg')?.getBBox?.();
+  const bbox = (rawBbox && rawBbox.width > 0)
+    ? rawBbox
+    : { width: 0, height: 0, x: 0, y: 0 };
+
   const cx = bbox.x + bbox.width  / 2;
   const cy = bbox.y + bbox.height / 2;
 
@@ -296,8 +295,8 @@ function renderControls(el) {
   // Resize
   resizeHandle.addEventListener('mousedown', e => {
     e.stopPropagation();
-    const startY     = e.clientY;
-    const initScale  = parseFloat(el.dataset.scale) || 1;
+    const startY    = e.clientY;
+    const initScale = parseFloat(el.dataset.scale) || 1;
 
     const onMove = mv => {
       const dy       = (mv.clientY - startY) / viewState.scale;
@@ -338,7 +337,7 @@ function updateControlsPosition(el) {
   controls.querySelector('rect').setAttribute('y', top  + height - 6);
 }
 
-// ─── Export & Upload to S3 ───────────────────────────────────────────────────
+// ─── Export & Upload to S3 ────────────────────────────────────────────────────
 document.getElementById('exportBtn').addEventListener('click', async () => {
   selectItem(null);
 
