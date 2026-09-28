@@ -272,69 +272,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ─── Out-of-Bounds Warning ─────────────────────────────────────────────────
   function checkArtworkBounds() {
-    const items = document.querySelectorAll('.canvas-item');
-    if (items.length === 0) { showWarning(false); return; }
+  const items = document.querySelectorAll('.canvas-item');
+  if (items.length === 0) { showWarning(false); return; }
 
-    let anyOutside = false;
+  const svgRect = svg.getBoundingClientRect();
+  const svgW    = parseFloat(svg.getAttribute('viewBox').split(' ')[2]);
+  const svgH    = parseFloat(svg.getAttribute('viewBox').split(' ')[3]);
+  const scaleX  = svgW / svgRect.width;
+  const scaleY  = svgH / svgRect.height;
 
-    for (const item of items) {
-      const itemBBox  = item.getBBox();
-      const matrix    = item.getCTM();
-      const svgMatrix = svg.getScreenCTM().inverse();
+  let anyOutside = false;
 
-      console.log('--- item debug ---');
-      console.log('dataset:', item.dataset.x, item.dataset.y, item.dataset.scale, item.dataset.rotation);
-      console.log('transform attr:', item.getAttribute('transform'));
-      console.log('getBBox:', JSON.stringify(itemBBox));
-      console.log('getCTM:', matrix ? `a:${matrix.a} b:${matrix.b} c:${matrix.c} d:${matrix.d} e:${matrix.e} f:${matrix.f}` : 'null');
-      console.log('getBoundingClientRect:', JSON.stringify(item.getBoundingClientRect()));
+  for (const item of items) {
+    const r = item.getBoundingClientRect();
 
-      const corners = [
-        { x: itemBBox.x,                  y: itemBBox.y },
-        { x: itemBBox.x + itemBBox.width,  y: itemBBox.y },
-        { x: itemBBox.x,                  y: itemBBox.y + itemBBox.height },
-        { x: itemBBox.x + itemBBox.width,  y: itemBBox.y + itemBBox.height }
-      ].map(pt => {
-        const svgPt = svg.createSVGPoint();
-        svgPt.x = pt.x;
-        svgPt.y = pt.y;
-        return svgPt.matrixTransform(matrix).matrixTransform(svgMatrix);
-      });
+    // Convert client rect to SVG coordinate space
+    const left   = (r.left   - svgRect.left) * scaleX;
+    const top    = (r.top    - svgRect.top)  * scaleY;
+    const right  = (r.right  - svgRect.left) * scaleX;
+    const bottom = (r.bottom - svgRect.top)  * scaleY;
 
-      const xs = corners.map(p => p.x);
-      const ys = corners.map(p => p.y);
-      const itemSVGBox = {
-        left:   Math.min(...xs),
-        right:  Math.max(...xs),
-        top:    Math.min(...ys),
-        bottom: Math.max(...ys)
-      };
+    let inside = false;
 
-      let inside = false;
-
-      for (const s of activeShapes) {
-        if (s.type === 'rect') {
-          const sx = s.xIn * PPI, sy = s.yIn * PPI;
-          const sw = s.wIn * PPI, sh = s.hIn * PPI;
-          if (
-            itemSVGBox.left   >= sx      &&
-            itemSVGBox.right  <= sx + sw &&
-            itemSVGBox.top    >= sy      &&
-            itemSVGBox.bottom <= sy + sh
-          ) { inside = true; break; }
-
-        } else if (s.type === 'circle') {
-          const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
-          const allIn = corners.every(p => {
-            const dx = p.x - cx, dy = p.y - cy;
-            return Math.sqrt(dx * dx + dy * dy) <= r;
-          });
-          if (allIn) { inside = true; break; }
+    for (const s of activeShapes) {
+      if (s.type === 'rect') {
+        const sx = s.xIn * PPI, sy = s.yIn * PPI;
+        const sw = s.wIn * PPI, sh = s.hIn * PPI;
+        if (left >= sx && right <= sx + sw && top >= sy && bottom <= sy + sh) {
+          inside = true; break;
+        }
+      } else if (s.type === 'circle') {
+        const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r2 = s.rIn * PPI;
+        const corners = [
+          { x: left,  y: top    },
+          { x: right, y: top    },
+          { x: left,  y: bottom },
+          { x: right, y: bottom }
+        ];
+        if (corners.every(p => Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2) <= r2)) {
+          inside = true; break;
         }
       }
-
-      if (!inside) { anyOutside = true; break; }
     }
+
+    if (!inside) { anyOutside = true; break; }
+  }
+
+  showWarning(anyOutside);
+}
+
 
     showWarning(anyOutside);
   }
