@@ -282,6 +282,13 @@ document.addEventListener('DOMContentLoaded', function () {
       const matrix    = item.getCTM();
       const svgMatrix = svg.getScreenCTM().inverse();
 
+      console.log('--- item debug ---');
+      console.log('dataset:', item.dataset.x, item.dataset.y, item.dataset.scale, item.dataset.rotation);
+      console.log('transform attr:', item.getAttribute('transform'));
+      console.log('getBBox:', JSON.stringify(itemBBox));
+      console.log('getCTM:', matrix ? `a:${matrix.a} b:${matrix.b} c:${matrix.c} d:${matrix.d} e:${matrix.e} f:${matrix.f}` : 'null');
+      console.log('getBoundingClientRect:', JSON.stringify(item.getBoundingClientRect()));
+
       const corners = [
         { x: itemBBox.x,                  y: itemBBox.y },
         { x: itemBBox.x + itemBBox.width,  y: itemBBox.y },
