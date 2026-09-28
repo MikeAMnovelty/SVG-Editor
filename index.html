@@ -1,5 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AMNovelty Tumbler Designer</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <!-- <link rel="stylesheet" href="./svgedit.css"> -->
+  <style>
+    /* minimal helpers if your CSS doesn't provide them */
+    body { font-family: system-ui, sans-serif; margin: 12px; }
+    .topbar { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+    .layout { display:flex; gap:12px; }
+    .palette { width:220px; }
+    .workspace { flex:1; }
+    #svgwrap { display:block; border:1px solid #ccc; border-radius:12px; padding:8px; background:#fff; }
+    #svgwrap.dragover { outline:3px dashed #08f; }
+    /*input[type="file"] { margin-bottom:8px; } */
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>AMNovelty Tumbler Designer</h1>
+    <a href="https://amnovelty-svg-uploads.s3.amazonaws.com/instructions/user-guide.pdf" target="_blank">
+    Download Instructions
+    </a>
+    <select id="templateSelect">
+    <option value="40oz">40oz Tumbler</option>
+    <option value="20oz">20oz Tumbler</option>
+    <option value="square">4" Square Coaster</option>
+    <option value="round">4" Round Coaster</option>
+    </select>
+    <button id="deleteBtn" style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Remove Selected</button>
+    <button id="exportBtn">Upload Design</button>
+  </header>
+
+  <main class="layout">
+    <aside class="palette">
+      <h2>Artwork</h2>
+      <div id="assetList"></div>
+    </aside>
+
+    <section class="workspace">
+      <div id="svgwrap">
+        <!-- <input id="file" type="file" accept=".svg" multiple /> -->
+        <svg id="canvas"
+             xmlns="http://www.w3.org/2000/svg"
+             width="100%"
+             height="600"
+             style="background:#fff; border-radius:12px; display:block;">
+          <!-- designs drop here -->
+        </svg>
+      </div>
+    </section>
+  </main>
 <script>
-(function(){
+document.addEventListener('DOMContentLoaded', function(){
   const PPI       = 72;
   const paddingIn = 0.125;
   const fitMode   = 'contain';
@@ -308,5 +363,6 @@
   // ─── Init ─────────────────────────────────────────────────────────────────
   drawTemplate('40oz');
 
-})();
+});
 </script>
+
