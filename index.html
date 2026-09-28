@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AMNovelty Tumbler Designer</title>
   <link rel="stylesheet" href="./css/styles.css">
-  <!-- <link rel="stylesheet" href="./svgedit.css"> -->
   <style>
-    /* minimal helpers if your CSS doesn't provide them */
     body { font-family: system-ui, sans-serif; margin: 12px; }
     .topbar { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
     .layout { display:flex; gap:12px; }
@@ -15,20 +13,19 @@
     .workspace { flex:1; }
     #svgwrap { display:block; border:1px solid #ccc; border-radius:12px; padding:8px; background:#fff; }
     #svgwrap.dragover { outline:3px dashed #08f; }
-    /*input[type="file"] { margin-bottom:8px; } */
   </style>
 </head>
 <body>
   <header class="topbar">
     <h1>AMNovelty Tumbler Designer</h1>
     <a href="https://amnovelty-svg-uploads.s3.amazonaws.com/instructions/user-guide.pdf" target="_blank">
-    Download Instructions
+      Download Instructions
     </a>
     <select id="templateSelect">
-    <option value="40oz">40oz Tumbler</option>
-    <option value="20oz">20oz Tumbler</option>
-    <option value="square">4" Square Coaster</option>
-    <option value="round">4" Round Coaster</option>
+      <option value="40oz">40oz Tumbler</option>
+      <option value="20oz">20oz Tumbler</option>
+      <option value="square">4" Square Coaster</option>
+      <option value="round">4" Round Coaster</option>
     </select>
     <button id="deleteBtn" style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Remove Selected</button>
     <button id="exportBtn">Upload Design</button>
@@ -42,26 +39,27 @@
 
     <section class="workspace">
       <div id="svgwrap">
-        <!-- <input id="file" type="file" accept=".svg" multiple /> -->
         <svg id="canvas"
              xmlns="http://www.w3.org/2000/svg"
              width="100%"
              height="600"
              style="background:#fff; border-radius:12px; display:block;">
-          <!-- designs drop here -->
+          <!-- Template shapes are inserted before this group, artwork goes inside it -->
+          <g id="viewport"></g>
         </svg>
       </div>
     </section>
   </main>
+
 <script>
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
   const PPI       = 72;
   const paddingIn = 0.125;
   const fitMode   = 'contain';
   const svgNS     = 'http://www.w3.org/2000/svg';
   const svg       = document.getElementById('canvas');
 
-  // ─── Template Definitions ─────────────────────────────────────────────────
+  // ─── Template Definitions ──────────────────────────────────────────────────
   const TEMPLATES = {
     '40oz': {
       label: '40oz Tumbler',
@@ -92,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   let activeShapes = TEMPLATES['40oz'].shapes;
 
-  // ─── Canvas Sizing & Shape Drawing ───────────────────────────────────────
+  // ─── Canvas Sizing & Shape Drawing ────────────────────────────────────────
   function drawTemplate(key) {
     svg.querySelectorAll('[data-template-shape]').forEach(el => el.remove());
     activeShapes = TEMPLATES[key].shapes;
@@ -115,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function(){
     svg.style.height = heightPx + 'px';
 
     const pad      = paddingIn * PPI;
-    const viewport = svg.querySelector('#viewport');
+    const viewport = svg.querySelector('#viewport'); // always exists now
 
     for (const s of activeShapes) {
       const group = document.createElementNS(svgNS, 'g');
@@ -166,13 +164,14 @@ document.addEventListener('DOMContentLoaded', function(){
         group.appendChild(inner);
       }
 
-      svg.insertBefore(group, viewport || null);
+      // Always insert template shapes BEFORE the viewport so artwork stays on top
+      svg.insertBefore(group, viewport);
     }
 
     showWarning(false);
   }
 
-  // ─── Fit Transform ────────────────────────────────────────────────────────
+  // ─── Fit Transform ─────────────────────────────────────────────────────────
   function computeFitTransform(imgW, imgH, boxX, boxY, boxW, boxH, mode) {
     const pad = paddingIn * PPI;
     const cw = boxW - pad * 2, ch = boxH - pad * 2;
@@ -184,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return { tx, ty, scale };
   }
 
-  // ─── Insert SVG into a target shape ──────────────────────────────────────
+  // ─── Insert SVG into a target shape ───────────────────────────────────────
   function insertSVGString(svgText, targetShapeIndex) {
     const parser = new DOMParser();
     const doc    = parser.parseFromString(svgText, 'image/svg+xml');
@@ -231,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function(){
     img.addEventListener('load', () => URL.revokeObjectURL(url));
   }
 
-  // ─── Drag / Drop from file system ────────────────────────────────────────
+  // ─── Drag / Drop from file system ─────────────────────────────────────────
   const wrap = document.getElementById('svgwrap');
   wrap.addEventListener('dragover',  e => { e.preventDefault(); wrap.classList.add('dragover'); });
   wrap.addEventListener('dragleave', () => wrap.classList.remove('dragover'));
@@ -271,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
-  // ─── Out-of-Bounds Warning ────────────────────────────────────────────────
+  // ─── Out-of-Bounds Warning ─────────────────────────────────────────────────
   function checkArtworkBounds() {
     const items = document.querySelectorAll('.canvas-item');
     if (items.length === 0) { showWarning(false); return; }
@@ -279,15 +278,15 @@ document.addEventListener('DOMContentLoaded', function(){
     let anyOutside = false;
 
     for (const item of items) {
-      const itemBBox = item.getBBox();
-      const matrix   = item.getCTM();
+      const itemBBox  = item.getBBox();
+      const matrix    = item.getCTM();
       const svgMatrix = svg.getScreenCTM().inverse();
 
       const corners = [
-        { x: itemBBox.x,                 y: itemBBox.y },
-        { x: itemBBox.x + itemBBox.width, y: itemBBox.y },
-        { x: itemBBox.x,                 y: itemBBox.y + itemBBox.height },
-        { x: itemBBox.x + itemBBox.width, y: itemBBox.y + itemBBox.height }
+        { x: itemBBox.x,                  y: itemBBox.y },
+        { x: itemBBox.x + itemBBox.width,  y: itemBBox.y },
+        { x: itemBBox.x,                  y: itemBBox.y + itemBBox.height },
+        { x: itemBBox.x + itemBBox.width,  y: itemBBox.y + itemBBox.height }
       ].map(pt => {
         const svgPt = svg.createSVGPoint();
         svgPt.x = pt.x;
@@ -333,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function(){
     showWarning(anyOutside);
   }
 
-  // ─── Warning Banner ───────────────────────────────────────────────────────
+  // ─── Warning Banner ────────────────────────────────────────────────────────
   function showWarning(show) {
     let banner = document.getElementById('boundsWarning');
     if (show && !banner) {
@@ -352,17 +351,20 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   }
 
-  // ─── Template Switcher ────────────────────────────────────────────────────
+  // ─── Template Switcher ─────────────────────────────────────────────────────
   document.getElementById('templateSelect').addEventListener('change', e => {
     drawTemplate(e.target.value);
   });
 
-  // ─── Expose bounds check to app.js ───────────────────────────────────────
+  // ─── Expose bounds check to app.js ────────────────────────────────────────
   window.checkArtworkBounds = checkArtworkBounds;
 
-  // ─── Init ─────────────────────────────────────────────────────────────────
+  // ─── Init ──────────────────────────────────────────────────────────────────
   drawTemplate('40oz');
 
 });
 </script>
 
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>

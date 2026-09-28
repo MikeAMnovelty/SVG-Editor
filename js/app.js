@@ -58,12 +58,13 @@ loadAssets();
 // ─── Canvas & Viewport Setup ─────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 
-let viewport = canvas.querySelector('#viewport');
-if (!viewport) {
-  viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  viewport.setAttribute('id', 'viewport');
-  canvas.appendChild(viewport);
-}
+//let viewport = canvas.querySelector('#viewport');
+//if (!viewport) {
+  //viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  //viewport.setAttribute('id', 'viewport');
+  //canvas.appendChild(viewport);
+//}
+const viewport = canvas.querySelector('#viewport');
 
 let activeItem = null;
 
