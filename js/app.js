@@ -177,6 +177,7 @@ canvas.addEventListener('drop', async e => {
     viewport.appendChild(group);
     attachTransformControls(group);
     selectItem(group);
+    if (window.checkArtworkBounds) window.checkArtworkBounds();  // ← added this to ensure is in the template
 
   } catch (err) {
     console.error('Could not load SVG:', file, err);

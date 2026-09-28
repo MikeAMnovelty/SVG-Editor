@@ -47,107 +47,182 @@
       </div>
     </section>
   </main>
-
 <script>
 (function(){
-  const PPI = 72; // CSS pixels per inch for display (change if you need different DPI)
-  const rectangles = [
-    { id: 'r1', wIn: 12.375, hIn: 5.25, xIn: 0.5, yIn: 0.5 },
-    { id: 'r2', wIn: 10.125, hIn: 3,    xIn: 0.5, yIn: 6.5 }
-  ];
-  const fitMode = 'contain'; // 'contain' or 'cover'
-  const paddingIn = 0.125; // inside-rect padding
+  const PPI       = 72;
+  const paddingIn = 0.125;
+  const fitMode   = 'contain';
+  const svgNS     = 'http://www.w3.org/2000/svg';
+  const svg       = document.getElementById('canvas');
 
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const svg = document.getElementById('canvas');
+  // ─── Template Definitions ─────────────────────────────────────────────────
+  const TEMPLATES = {
+    '40oz': {
+      label: '40oz Tumbler',
+      shapes: [
+        { id: 'r1', type: 'rect', wIn: 12.375, hIn: 5.25, xIn: 0.5, yIn: 0.5 },
+        { id: 'r2', type: 'rect', wIn: 10.125, hIn: 3,    xIn: 0.5, yIn: 6.5 }
+      ]
+    },
+    '20oz': {
+      label: '20oz Tumbler',
+      shapes: [
+        { id: 'r1', type: 'rect', wIn: 10.125, hIn: 5.25, xIn: 0.5, yIn: 0.5 }
+      ]
+    },
+    'square': {
+      label: '4" Square Coaster',
+      shapes: [
+        { id: 'r1', type: 'rect', wIn: 4.0, hIn: 4.0, xIn: 0.5, yIn: 0.5 }
+      ]
+    },
+    'round': {
+      label: '4" Round Coaster',
+      shapes: [
+        { id: 'r1', type: 'circle', rIn: 2.0, cxIn: 2.5, cyIn: 2.5 }
+      ]
+    }
+  };
 
-  // compute svg pixel size to contain both rects and set viewBox accordingly
-  //const widthPx = Math.ceil(Math.max(...rectangles.map(r => r.xIn + r.wIn + 0.5)) * PPI);
-  //const heightPx = Math.ceil(Math.max(...rectangles.map(r => r.yIn + r.hIn + 0.5)) * PPI);
-  //svg.setAttribute('viewBox', `0 0 \${widthPx} \${heightPx}`);
-  //svg.style.width = Math.min(widthPx, 1200) + 'px';
-  //svg.style.height = (heightPx) + 'px';
-  // 1. Calculate the values
-  const widthPx = Math.ceil(Math.max(...rectangles.map(r => r.xIn + r.wIn + 0.5)) * PPI);
-  const heightPx = Math.ceil(Math.max(...rectangles.map(r => r.yIn + r.hIn + 0.5)) * PPI);
+  // Active template state — rectangles exposed so drop-targeting still works
+  let activeShapes = TEMPLATES['40oz'].shapes;
 
-  // 2. Apply them to the SVG (This MUST stay right below the lines above)
-  svg.setAttribute('viewBox', '0 0 ' + widthPx + ' ' + heightPx);
-  
-  // 3. Set the display size
-  svg.style.width = Math.min(widthPx, 1200) + 'px';
-  svg.style.height = (heightPx) + 'px';
+  // ─── Canvas Sizing & Shape Drawing ───────────────────────────────────────
+  function drawTemplate(key) {
+    // Clear previous template shapes only
+    svg.querySelectorAll('[data-template-shape]').forEach(el => el.remove());
 
-  // draw rectangles
-  for (const r of rectangles) {
-    const x = r.xIn * PPI;
-    const y = r.yIn * PPI;
-    const w = r.wIn * PPI;
-    const h = r.hIn * PPI;
-    const group = document.createElementNS(svgNS,'g');
-    group.dataset.rectId = r.id;
+    activeShapes = TEMPLATES[key].shapes;
 
-    const rect = document.createElementNS(svgNS,'rect');
-    rect.setAttribute('x', x);
-    rect.setAttribute('y', y);
-    rect.setAttribute('width', w);
-    rect.setAttribute('height', h);
-    rect.setAttribute('fill', 'none');
-    rect.setAttribute('stroke', '#000');
-    rect.setAttribute('stroke-width', 1);
-    rect.setAttribute('data-target', r.id);
+    // Calculate bounding box to size the canvas
+    let maxX = 0, maxY = 0;
+    for (const s of activeShapes) {
+      if (s.type === 'rect') {
+        maxX = Math.max(maxX, s.xIn + s.wIn + 0.5);
+        maxY = Math.max(maxY, s.yIn + s.hIn + 0.5);
+      } else if (s.type === 'circle') {
+        maxX = Math.max(maxX, s.cxIn + s.rIn + 0.5);
+        maxY = Math.max(maxY, s.cyIn + s.rIn + 0.5);
+      }
+    }
+
+    const widthPx  = Math.ceil(maxX * PPI);
+    const heightPx = Math.ceil(maxY * PPI);
+    svg.setAttribute('viewBox', '0 0 ' + widthPx + ' ' + heightPx);
+    svg.style.width  = Math.min(widthPx, 1200) + 'px';
+    svg.style.height = heightPx + 'px';
 
     const pad = paddingIn * PPI;
-    const inner = document.createElementNS(svgNS,'rect');
-    inner.setAttribute('x', x + pad);
-    inner.setAttribute('y', y + pad);
-    inner.setAttribute('width', Math.max(0, w - pad*2));
-    inner.setAttribute('height', Math.max(0, h - pad*2));
-    inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
+    const viewport = svg.querySelector('#viewport'); // insert shapes BEFORE viewport
 
-    group.appendChild(rect);
-    group.appendChild(inner);
-    svg.appendChild(group);
+    for (const s of activeShapes) {
+      const group = document.createElementNS(svgNS, 'g');
+      group.setAttribute('data-template-shape', s.id);
+
+      if (s.type === 'rect') {
+        const x = s.xIn * PPI, y = s.yIn * PPI;
+        const w = s.wIn * PPI, h = s.hIn * PPI;
+
+        const outer = document.createElementNS(svgNS, 'rect');
+        outer.setAttribute('x', x);
+        outer.setAttribute('y', y);
+        outer.setAttribute('width', w);
+        outer.setAttribute('height', h);
+        outer.setAttribute('fill', 'none');
+        outer.setAttribute('stroke', '#000');
+        outer.setAttribute('stroke-width', 1);
+        outer.setAttribute('data-target', s.id);
+
+        const inner = document.createElementNS(svgNS, 'rect');
+        inner.setAttribute('x', x + pad);
+        inner.setAttribute('y', y + pad);
+        inner.setAttribute('width',  Math.max(0, w - pad * 2));
+        inner.setAttribute('height', Math.max(0, h - pad * 2));
+        inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
+
+        group.appendChild(outer);
+        group.appendChild(inner);
+
+      } else if (s.type === 'circle') {
+        const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
+
+        const outer = document.createElementNS(svgNS, 'circle');
+        outer.setAttribute('cx', cx);
+        outer.setAttribute('cy', cy);
+        outer.setAttribute('r', r);
+        outer.setAttribute('fill', 'none');
+        outer.setAttribute('stroke', '#000');
+        outer.setAttribute('stroke-width', 1);
+
+        const inner = document.createElementNS(svgNS, 'circle');
+        inner.setAttribute('cx', cx);
+        inner.setAttribute('cy', cy);
+        inner.setAttribute('r', Math.max(0, r - pad));
+        inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
+
+        group.appendChild(outer);
+        group.appendChild(inner);
+      }
+
+      // Always insert template shapes before the viewport layer
+      svg.insertBefore(group, viewport || null);
+    }
+
+    showWarning(false); // reset warning on template switch
   }
 
+  // ─── Fit Transform (unchanged) ────────────────────────────────────────────
   function computeFitTransform(imgW, imgH, boxX, boxY, boxW, boxH, mode) {
     const pad = paddingIn * PPI;
-    const cw = boxW - pad*2, ch = boxH - pad*2;
+    const cw = boxW - pad * 2, ch = boxH - pad * 2;
     const sx = cw / imgW, sy = ch / imgH;
-    let scale = (mode === 'cover') ? Math.max(sx, sy) : Math.min(sx, sy);
+    const scale = (mode === 'cover') ? Math.max(sx, sy) : Math.min(sx, sy);
     const sw = imgW * scale, sh = imgH * scale;
-    const tx = boxX + pad + (cw - sw)/2;
-    const ty = boxY + pad + (ch - sh)/2;
+    const tx = boxX + pad + (cw - sw) / 2;
+    const ty = boxY + pad + (ch - sh) / 2;
     return { tx, ty, scale };
   }
 
-  function insertSVGString(svgText, targetRectIndex) {
+  // ─── Insert SVG into a target shape ──────────────────────────────────────
+  function insertSVGString(svgText, targetShapeIndex) {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const doc    = parser.parseFromString(svgText, 'image/svg+xml');
     const srcSvg = doc.documentElement;
-    let iw=0, ih=0;
+    let iw = 0, ih = 0;
+
     const vb = srcSvg.getAttribute('viewBox');
     if (vb) {
       const parts = vb.trim().split(/\s+|,/).map(Number);
       iw = parts[2]; ih = parts[3];
     } else {
-      iw = parseFloat(srcSvg.getAttribute('width') || 0);
+      iw = parseFloat(srcSvg.getAttribute('width')  || 0);
       ih = parseFloat(srcSvg.getAttribute('height') || 0);
     }
     if (!iw || !ih) { iw = 100; ih = 100; }
 
-    const target = rectangles[targetRectIndex];
-    const boxX = target.xIn * PPI, boxY = target.yIn * PPI, boxW = target.wIn * PPI, boxH = target.hIn * PPI;
-    const fit = computeFitTransform(iw, ih, boxX, boxY, boxW, boxH, fitMode);
+    const target = activeShapes[targetShapeIndex];
+    let boxX, boxY, boxW, boxH;
 
-    // Use <image> with data URL to keep SVG as vector content
-    const img = document.createElementNS(svgNS,'image');
+    if (target.type === 'rect') {
+      boxX = target.xIn * PPI; boxY = target.yIn * PPI;
+      boxW = target.wIn * PPI; boxH = target.hIn * PPI;
+    } else if (target.type === 'circle') {
+      // treat bounding square of circle as the box
+      boxX = (target.cxIn - target.rIn) * PPI;
+      boxY = (target.cyIn - target.rIn) * PPI;
+      boxW = target.rIn * 2 * PPI;
+      boxH = target.rIn * 2 * PPI;
+    }
+
+    const fit  = computeFitTransform(iw, ih, boxX, boxY, boxW, boxH, fitMode);
+    const img  = document.createElementNS(svgNS, 'image');
     const blob = new Blob([svgText], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    img.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
+    const url  = URL.createObjectURL(blob);
+
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
     img.setAttribute('x', fit.tx);
     img.setAttribute('y', fit.ty);
-    img.setAttribute('width', iw * fit.scale);
+    img.setAttribute('width',  iw * fit.scale);
     img.setAttribute('height', ih * fit.scale);
     img.setAttribute('preserveAspectRatio', (fitMode === 'cover') ? 'xMidYMid slice' : 'xMidYMid meet');
     img.dataset.targetRect = target.id;
@@ -156,60 +231,121 @@
     img.addEventListener('load', () => URL.revokeObjectURL(url));
   }
 
-  // drag/drop handlers
+  // ─── Drag / Drop from file system ────────────────────────────────────────
   const wrap = document.getElementById('svgwrap');
-  wrap.addEventListener('dragover', e => { e.preventDefault(); wrap.classList.add('dragover'); });
-  wrap.addEventListener('dragleave', e => wrap.classList.remove('dragover'));
+  wrap.addEventListener('dragover',  e => { e.preventDefault(); wrap.classList.add('dragover'); });
+  wrap.addEventListener('dragleave', () => wrap.classList.remove('dragover'));
   wrap.addEventListener('drop', e => {
     e.preventDefault();
     wrap.classList.remove('dragover');
     const files = e.dataTransfer.files;
     if (!files || files.length === 0) return;
 
-    // map drop point to SVG coordinates
     const pt = svg.createSVGPoint();
     pt.x = e.clientX; pt.y = e.clientY;
     const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
-    const rectIndex = rectangles.findIndex(r => {
-      const x = r.xIn*PPI, y = r.yIn*PPI, w = r.wIn*PPI, h = r.hIn*PPI;
-      return svgPt.x >= x && svgPt.x <= x + w && svgPt.y >= y && svgPt.y <= y + h;
+
+    // Find which shape the drop landed in
+    const shapeIndex = activeShapes.findIndex(s => {
+      if (s.type === 'rect') {
+        const x = s.xIn * PPI, y = s.yIn * PPI;
+        return svgPt.x >= x && svgPt.x <= x + s.wIn * PPI &&
+               svgPt.y >= y && svgPt.y <= y + s.hIn * PPI;
+      } else if (s.type === 'circle') {
+        const dx = svgPt.x - s.cxIn * PPI;
+        const dy = svgPt.y - s.cyIn * PPI;
+        return Math.sqrt(dx * dx + dy * dy) <= s.rIn * PPI;
+      }
+      return false;
     });
-    const targetIndex = rectIndex >= 0 ? rectIndex : 0;
+    const targetIndex = shapeIndex >= 0 ? shapeIndex : 0;
 
     for (const file of files) {
       if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
         const reader = new FileReader();
-        reader.onload = ev => insertSVGString(ev.target.result, targetIndex);
+        reader.onload = ev => {
+          insertSVGString(ev.target.result, targetIndex);
+          if (window.checkArtworkBounds) window.checkArtworkBounds();
+        };
         reader.readAsText(file);
       }
     }
   });
 
-  // file input fallback
-  //document.getElementById('file').addEventListener('change', e => {
-    //const files = e.target.files;
-    //if (!files) return;
-    //let idx = 0;
-    //for (const file of files) {
-      //if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
-        //const reader = new FileReader();
-        //const targetIndex = Math.min(idx, rectangles.length - 1);
-        //reader.onload = ev => insertSVGString(ev.target.result, targetIndex);
-        //reader.readAsText(file);
-        //idx++;
-      //}
-    //}
-  //});
+  // ─── Out-of-Bounds Warning ────────────────────────────────────────────────
+  function checkArtworkBounds() {
+    const items = document.querySelectorAll('.canvas-item');
+    if (items.length === 0) { showWarning(false); return; }
 
-  // Export button: serializes SVG and triggers download
+    let anyOutside = false;
+
+    for (const item of items) {
+      const iRect = item.getBoundingClientRect();
+      let inside  = false;
+
+      for (const s of activeShapes) {
+        const shapeEl = svg.querySelector(`[data-template-shape="${s.id}"] \${s.type === 'circle' ? 'circle' : 'rect'}`);
+        if (!shapeEl) continue;
+        const sRect = shapeEl.getBoundingClientRect();
+
+        if (s.type === 'rect') {
+          if (iRect.left >= sRect.left && iRect.right  <= sRect.right &&
+              iRect.top  >= sRect.top  && iRect.bottom <= sRect.bottom) {
+            inside = true; break;
+          }
+        } else if (s.type === 'circle') {
+          const cx = sRect.left + sRect.width  / 2;
+          const cy = sRect.top  + sRect.height / 2;
+          const r  = sRect.width / 2;
+          const corners = [
+            [iRect.left,  iRect.top],
+            [iRect.right, iRect.top],
+            [iRect.left,  iRect.bottom],
+            [iRect.right, iRect.bottom]
+          ];
+          if (corners.every(([px, py]) => Math.sqrt((px-cx)**2 + (py-cy)**2) <= r)) {
+            inside = true; break;
+          }
+        }
+      }
+
+      if (!inside) { anyOutside = true; break; }
+    }
+
+    showWarning(anyOutside);
+  }
+
+  function showWarning(show) {
+    let banner = document.getElementById('boundsWarning');
+    if (show && !banner) {
+      banner = document.createElement('div');
+      banner.id = 'boundsWarning';
+      banner.textContent = '⚠️ Some artwork is outside the engraving area.';
+      banner.style.cssText = `
+        position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+        background:#fff3cd; color:#856404; border:1px solid #ffc107;
+        padding:10px 20px; border-radius:8px; font-weight:bold;
+        box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:9999;
+      `;
+      document.body.appendChild(banner);
+    } else if (!show && banner) {
+      banner.remove();
+    }
+  }
+
+  // ─── Template Switcher ────────────────────────────────────────────────────
+  document.getElementById('templateSelect').addEventListener('change', e => {
+    drawTemplate(e.target.value);
+  });
+
+  // ─── Export (unchanged) ───────────────────────────────────────────────────
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const clone = svg.cloneNode(true);
-    // remove interaction-only attributes if needed here
+    const clone      = svg.cloneNode(true);
     const serializer = new XMLSerializer();
-    const str = serializer.serializeToString(clone);
-    const blob = new Blob([str], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const str        = serializer.serializeToString(clone);
+    const blob       = new Blob([str], { type: 'image/svg+xml' });
+    const url        = URL.createObjectURL(blob);
+    const a          = document.createElement('a');
     a.href = url;
     a.download = 'engraving-layout.svg';
     document.body.appendChild(a);
@@ -217,8 +353,16 @@
     a.remove();
     URL.revokeObjectURL(url);
   });
+
+  // ─── Expose bounds check to app.js ───────────────────────────────────────
+  window.checkArtworkBounds = checkArtworkBounds;
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+  drawTemplate('40oz');
+
 })();
 </script>
+
 <script type="module" src="./js/app.js"></script>
 </body>
 </html>
