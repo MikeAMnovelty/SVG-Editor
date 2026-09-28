@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
     svg.style.height = heightPx + 'px';
 
     const pad      = paddingIn * PPI;
-    const viewport = svg.querySelector('#viewport'); // always exists now
+    const viewport = svg.querySelector('#viewport');
 
     for (const s of activeShapes) {
       const group = document.createElementNS(svgNS, 'g');
@@ -164,7 +164,6 @@ document.addEventListener('DOMContentLoaded', function () {
         group.appendChild(inner);
       }
 
-      // Always insert template shapes BEFORE the viewport so artwork stays on top
       svg.insertBefore(group, viewport);
     }
 
@@ -272,55 +271,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ─── Out-of-Bounds Warning ─────────────────────────────────────────────────
   function checkArtworkBounds() {
-  const items = document.querySelectorAll('.canvas-item');
-  if (items.length === 0) { showWarning(false); return; }
+    const items = document.querySelectorAll('.canvas-item');
+    if (items.length === 0) { showWarning(false); return; }
 
-  const svgRect = svg.getBoundingClientRect();
-  const svgW    = parseFloat(svg.getAttribute('viewBox').split(' ')[2]);
-  const svgH    = parseFloat(svg.getAttribute('viewBox').split(' ')[3]);
-  const scaleX  = svgW / svgRect.width;
-  const scaleY  = svgH / svgRect.height;
+    const svgRect = svg.getBoundingClientRect();
+    const vbParts = svg.getAttribute('viewBox').split(' ');
+    const svgW    = parseFloat(vbParts[2]);
+    const svgH    = parseFloat(vbParts[3]);
+    const scaleX  = svgW / svgRect.width;
+    const scaleY  = svgH / svgRect.height;
 
-  let anyOutside = false;
+    let anyOutside = false;
 
-  for (const item of items) {
-    const r = item.getBoundingClientRect();
+    for (const item of items) {
+      const cr     = item.getBoundingClientRect();
+      const left   = (cr.left   - svgRect.left) * scaleX;
+      const top    = (cr.top    - svgRect.top)  * scaleY;
+      const right  = (cr.right  - svgRect.left) * scaleX;
+      const bottom = (cr.bottom - svgRect.top)  * scaleY;
 
-    // Convert client rect to SVG coordinate space
-    const left   = (r.left   - svgRect.left) * scaleX;
-    const top    = (r.top    - svgRect.top)  * scaleY;
-    const right  = (r.right  - svgRect.left) * scaleX;
-    const bottom = (r.bottom - svgRect.top)  * scaleY;
+      let inside = false;
 
-    let inside = false;
-
-    for (const s of activeShapes) {
-      if (s.type === 'rect') {
-        const sx = s.xIn * PPI, sy = s.yIn * PPI;
-        const sw = s.wIn * PPI, sh = s.hIn * PPI;
-        if (left >= sx && right <= sx + sw && top >= sy && bottom <= sy + sh) {
-          inside = true; break;
-        }
-      } else if (s.type === 'circle') {
-        const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r2 = s.rIn * PPI;
-        const corners = [
-          { x: left,  y: top    },
-          { x: right, y: top    },
-          { x: left,  y: bottom },
-          { x: right, y: bottom }
-        ];
-        if (corners.every(p => Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2) <= r2)) {
-          inside = true; break;
+      for (const s of activeShapes) {
+        if (s.type === 'rect') {
+          const sx = s.xIn * PPI, sy = s.yIn * PPI;
+          const sw = s.wIn * PPI, sh = s.hIn * PPI;
+          if (left >= sx && right <= sx + sw && top >= sy && bottom <= sy + sh) {
+            inside = true; break;
+          }
+        } else if (s.type === 'circle') {
+          const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
+          const corners = [
+            { x: left,  y: top    },
+            { x: right, y: top    },
+            { x: left,  y: bottom },
+            { x: right, y: bottom }
+          ];
+          if (corners.every(p => Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2) <= r)) {
+            inside = true; break;
+          }
         }
       }
+
+      if (!inside) { anyOutside = true; break; }
     }
-
-    if (!inside) { anyOutside = true; break; }
-  }
-
-  showWarning(anyOutside);
-}
-
 
     showWarning(anyOutside);
   }
@@ -331,13 +325,21 @@ document.addEventListener('DOMContentLoaded', function () {
     if (show && !banner) {
       banner = document.createElement('div');
       banner.id = 'boundsWarning';
-      banner.textContent = '⚠️ Some artwork is outside the engraving area.';
-      banner.style.cssText = `
-        position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
-        background:#fff3cd; color:#856404; border:1px solid #ffc107;
-        padding:10px 20px; border-radius:8px; font-weight:bold;
-        box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:9999;
-      `;
+      banner.textContent = '\u26a0\ufe0f Some artwork is outside the engraving area.';
+      banner.style.cssText = [
+        'position:fixed',
+        'bottom:16px',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'background:#fff3cd',
+        'color:#856404',
+        'border:1px solid #ffc107',
+        'padding:10px 20px',
+        'border-radius:8px',
+        'font-weight:bold',
+        'box-shadow:0 2px 8px rgba(0,0,0,0.15)',
+        'z-index:9999'
+      ].join(';');
       document.body.appendChild(banner);
     } else if (!show && banner) {
       banner.remove();
