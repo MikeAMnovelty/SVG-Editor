@@ -145,16 +145,37 @@ canvas.addEventListener('drop', async e => {
   const dropCoords = clientToViewport(e.clientX, e.clientY);
 
   try {
-    const res = await fetch(file);
+    const res  = await fetch(file);
     const text = await res.text();
+
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(text, 'image/svg+xml');
+    const srcSvg = doc.documentElement;
+
+    // Read intrinsic size from the source SVG
+    let iw = 0, ih = 0;
+    const vb = srcSvg.getAttribute('viewBox');
+    if (vb) {
+      const parts = vb.trim().split(/\s+|,/).map(Number);
+      iw = parts[2]; ih = parts[3];
+    } else {
+      iw = parseFloat(srcSvg.getAttribute('width')  || 0);
+      ih = parseFloat(srcSvg.getAttribute('height') || 0);
+    }
+    if (!iw || !ih) { iw = 100; ih = 100; }
+
+    // Default render width of 72px (1 inch at 72ppi), scale height proportionally
+    const renderW = 72;
+    const scale   = renderW / iw;
 
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.setAttribute('class', 'canvas-item');
     group.innerHTML = text;
 
-    group.dataset.x = dropCoords.x - 40;
-    group.dataset.y = dropCoords.y - 40;
-    group.dataset.scale = 1;
+    // Center on drop point
+    group.dataset.x        = dropCoords.x - (iw * scale) / 2;
+    group.dataset.y        = dropCoords.y - (ih * scale) / 2;
+    group.dataset.scale    = scale.toFixed(3);
     group.dataset.rotation = 0;
 
     viewport.appendChild(group);
@@ -176,13 +197,20 @@ function updateTransform(el) {
   const scale = parseFloat(el.dataset.scale)    || 1;
   const rot   = parseFloat(el.dataset.rotation) || 0;
 
-  const rawBbox = el.querySelector('svg')?.getBBox?.();
-  const bbox = (rawBbox && rawBbox.width > 0)
-    ? rawBbox
-    : { width: 0, height: 0, x: 0, y: 0 };
-
-  const cx = bbox.x + bbox.width  / 2;
-  const cy = bbox.y + bbox.height / 2;
+  // Use viewBox for center calculation — reliable before and after render
+  const inner = el.querySelector('svg');
+  let cx = 0, cy = 0;
+  if (inner) {
+    const vb = inner.getAttribute('viewBox');
+    if (vb) {
+      const parts = vb.trim().split(/\s+|,/).map(Number);
+      cx = parts[2] / 2;
+      cy = parts[3] / 2;
+    } else {
+      cx = parseFloat(inner.getAttribute('width')  || 0) / 2;
+      cy = parseFloat(inner.getAttribute('height') || 0) / 2;
+    }
+  }
 
   el.setAttribute(
     'transform',
