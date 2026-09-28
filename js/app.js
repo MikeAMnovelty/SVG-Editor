@@ -55,11 +55,9 @@ function renderNodes(nodes) {
 
 loadAssets();
 
-
-// ─── Canvas & Viewport Setup ────────────────────────────────────────────────
+// ─── Canvas & Viewport Setup ─────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 
-// Ensure a dedicated viewport <g> exists so canvas-level zoom/pan doesn't break export
 let viewport = canvas.querySelector('#viewport');
 if (!viewport) {
   viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -69,7 +67,6 @@ if (!viewport) {
 
 let activeItem = null;
 
-// Canvas Zoom & Pan state
 const viewState = {
   scale: 1,
   x: 0,
@@ -80,11 +77,10 @@ const viewState = {
 };
 
 function updateViewportTransform() {
-  viewport.setAttribute('transform', `translate(${viewState.x}, ${viewState.y}) scale(${viewState.scale})`);
+  viewport.setAttribute('transform', `translate(${viewState.x}, \${viewState.y}) scale(${viewState.scale})`);
   if (activeItem) updateControlsPosition(activeItem);
 }
 
-// Convert screen (client) coordinates to SVG viewport coordinates
 function clientToViewport(clientX, clientY) {
   const pt = canvas.createSVGPoint();
   pt.x = clientX;
@@ -92,19 +88,15 @@ function clientToViewport(clientX, clientY) {
   return pt.matrixTransform(viewport.getScreenCTM().inverse());
 }
 
-// ─── Canvas Zoom & Pan Interactions ─────────────────────────────────────────
+// ─── Zoom & Pan ──────────────────────────────────────────────────────────────
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
-
   const zoomFactor = 1.1;
   const direction = e.deltaY < 0 ? 1 : -1;
   const factor = direction > 0 ? zoomFactor : 1 / zoomFactor;
-
-  // Restrict zoom limits
   const newScale = Math.min(Math.max(viewState.scale * factor, 0.1), 10);
   if (newScale === viewState.scale) return;
 
-  // Zoom centered on current mouse pointer
   const rect = canvas.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
@@ -112,11 +104,9 @@ canvas.addEventListener('wheel', e => {
   viewState.x = mouseX - (mouseX - viewState.x) * (newScale / viewState.scale);
   viewState.y = mouseY - (mouseY - viewState.y) * (newScale / viewState.scale);
   viewState.scale = newScale;
-
   updateViewportTransform();
 }, { passive: false });
 
-// Pan Canvas with Left-click on canvas background or Middle-click
 canvas.addEventListener('mousedown', e => {
   if (e.target === canvas || e.button === 1) {
     selectItem(null);
@@ -141,7 +131,7 @@ window.addEventListener('mouseup', () => {
   }
 });
 
-// ─── Canvas Drop Zone Setup ─────────────────────────────────────────────────
+// ─── Canvas Drop Zone ────────────────────────────────────────────────────────
 canvas.addEventListener('dragover', e => {
   e.preventDefault();
   canvas.style.outline = '2px dashed #aac';
@@ -158,7 +148,6 @@ canvas.addEventListener('drop', async e => {
   const file = e.dataTransfer.getData('text/plain');
   if (!file) return;
 
-  // Drop at accurate coordinates regardless of zoom/pan state
   const dropCoords = clientToViewport(e.clientX, e.clientY);
 
   try {
@@ -177,7 +166,7 @@ canvas.addEventListener('drop', async e => {
     viewport.appendChild(group);
     attachTransformControls(group);
     selectItem(group);
-    if (window.checkArtworkBounds) window.checkArtworkBounds();  // ← added this to ensure is in the template
+    setTimeout(() => { if (window.checkArtworkBounds) window.checkArtworkBounds(); }, 50);
 
   } catch (err) {
     console.error('Could not load SVG:', file, err);
@@ -186,18 +175,18 @@ canvas.addEventListener('drop', async e => {
 
 // ─── Transform Engine ────────────────────────────────────────────────────────
 function updateTransform(el) {
-  const x = parseFloat(el.dataset.x) || 0;
-  const y = parseFloat(el.dataset.y) || 0;
-  const scale = parseFloat(el.dataset.scale) || 1;
+  const x   = parseFloat(el.dataset.x)        || 0;
+  const y   = parseFloat(el.dataset.y)        || 0;
+  const scale = parseFloat(el.dataset.scale)  || 1;
   const rot = parseFloat(el.dataset.rotation) || 0;
 
   const bbox = el.querySelector('svg')?.getBBox?.() || { width: 80, height: 80, x: 0, y: 0 };
-  const cx = bbox.x + bbox.width / 2;
+  const cx = bbox.x + bbox.width  / 2;
   const cy = bbox.y + bbox.height / 2;
 
   el.setAttribute(
     'transform',
-    `translate(${x}, ${y}) translate(${cx}, ${cy}) rotate(${rot}) scale(${scale}) translate(${-cx}, ${-cy})`
+    `translate(${x}, \${y}) translate(${cx}, \${cy}) rotate(${rot}) scale(${scale}) translate(${-cx}, \${-cy})`
   );
 }
 
@@ -212,9 +201,9 @@ function deleteSelected() {
   if (!activeItem) return;
   activeItem.remove();
   selectItem(null);
+  if (window.checkArtworkBounds) window.checkArtworkBounds();
 }
 
-// Delete key listener
 document.addEventListener('keydown', e => {
   if ((e.key === 'Delete' || e.key === 'Backspace') && activeItem) {
     e.preventDefault();
@@ -222,17 +211,14 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Delete button
 document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
-
 
 // ─── Transform & Interaction Controls ────────────────────────────────────────
 function attachTransformControls(el) {
   updateTransform(el);
 
-  // Drag item across canvas (zoom-aware)
   el.addEventListener('mousedown', e => {
-    if (e.button !== 0) return; // Only left-click
+    if (e.button !== 0) return;
     e.stopPropagation();
     selectItem(el);
 
@@ -246,7 +232,7 @@ function attachTransformControls(el) {
       el.dataset.y = origY + (currentMouse.y - startMouse.y);
       updateTransform(el);
       updateControlsPosition(el);
-      if (window.checkArtworkBounds) window.checkArtworkBounds();  // ← add this to check if in bounds
+      if (window.checkArtworkBounds) window.checkArtworkBounds();
     };
 
     const onUp = () => {
@@ -259,12 +245,11 @@ function attachTransformControls(el) {
   });
 }
 
-// ─── Overlay UI Handles (Resize & Rotate) ───────────────────────────────────
+// ─── Overlay UI Handles (Resize & Rotate) ────────────────────────────────────
 function renderControls(el) {
   const controlsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   controlsGroup.setAttribute('class', 'ui-controls');
 
-  // Rotate Handle (Top Circle)
   const rotHandle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   rotHandle.setAttribute('r', '7');
   rotHandle.setAttribute('fill', '#007bff');
@@ -272,7 +257,6 @@ function renderControls(el) {
   rotHandle.setAttribute('stroke-width', '2');
   rotHandle.style.cursor = 'grab';
 
-  // Resize Handle (Bottom-Right Box)
   const resizeHandle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   resizeHandle.setAttribute('width', '12');
   resizeHandle.setAttribute('height', '12');
@@ -283,19 +267,18 @@ function renderControls(el) {
 
   controlsGroup.appendChild(rotHandle);
   controlsGroup.appendChild(resizeHandle);
-  canvas.appendChild(controlsGroup); // Placed at top-level SVG for stable handle sizes
+  canvas.appendChild(controlsGroup);
 
-  // Rotate Drag
+  // Rotate
   rotHandle.addEventListener('mousedown', e => {
     e.stopPropagation();
-    const bbox = el.getBoundingClientRect();
-    const centerX = bbox.left + bbox.width / 2;
-    const centerY = bbox.top + bbox.height / 2;
+    const bbox    = el.getBoundingClientRect();
+    const centerX = bbox.left + bbox.width  / 2;
+    const centerY = bbox.top  + bbox.height / 2;
 
     const onMove = mv => {
       const radians = Math.atan2(mv.clientY - centerY, mv.clientX - centerX);
-      let degrees = radians * (180 / Math.PI) - 90;
-      el.dataset.rotation = degrees;
+      el.dataset.rotation = radians * (180 / Math.PI) - 90;
       updateTransform(el);
       updateControlsPosition(el);
     };
@@ -309,30 +292,20 @@ function renderControls(el) {
     window.addEventListener('mouseup', onUp);
   });
 
-  // Resize Drag
+  // Resize
   resizeHandle.addEventListener('mousedown', e => {
     e.stopPropagation();
-    const startY = e.clientY;
-    const initScale = parseFloat(el.dataset.scale) || 1;
+    const startY     = e.clientY;
+    const initScale  = parseFloat(el.dataset.scale) || 1;
 
     const onMove = mv => {
-      const dy = (mv.clientY - startY) / viewState.scale;
+      const dy       = (mv.clientY - startY) / viewState.scale;
       const newScale = Math.max(0.1, initScale + dy * 0.01);
       el.dataset.scale = newScale.toFixed(3);
       updateTransform(el);
       updateControlsPosition(el);
-      if (window.checkArtworkBounds) window.checkArtworkBounds(); // ← add this
+      if (window.checkArtworkBounds) window.checkArtworkBounds();
     };
-
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  });
-
 
     const onUp = () => {
       window.removeEventListener('mousemove', onMove);
@@ -351,46 +324,31 @@ function updateControlsPosition(el) {
   if (!controls || !el) return;
 
   const canvasRect = canvas.getBoundingClientRect();
-  const bbox = el.getBoundingClientRect();
+  const bbox       = el.getBoundingClientRect();
 
-  const left = bbox.left - canvasRect.left;
-  const top = bbox.top - canvasRect.top;
-  const width = bbox.width;
+  const left   = bbox.left   - canvasRect.left;
+  const top    = bbox.top    - canvasRect.top;
+  const width  = bbox.width;
   const height = bbox.height;
 
-  const rotHandle = controls.querySelector('circle');
-  const resizeHandle = controls.querySelector('rect');
-
-  rotHandle.setAttribute('cx', left + width / 2);
-  rotHandle.setAttribute('cy', top - 15);
-
-  resizeHandle.setAttribute('x', left + width - 6);
-  resizeHandle.setAttribute('y', top + height - 6);
+  controls.querySelector('circle').setAttribute('cx', left + width / 2);
+  controls.querySelector('circle').setAttribute('cy', top - 15);
+  controls.querySelector('rect').setAttribute('x', left + width  - 6);
+  controls.querySelector('rect').setAttribute('y', top  + height - 6);
 }
 
-// ─── Export SVG & Upload to S3 ──────────────────────────────────────────────
+// ─── Export & Upload to S3 ───────────────────────────────────────────────────
 document.getElementById('exportBtn').addEventListener('click', async () => {
   selectItem(null);
 
-  // 1. Capture current view and hide the grid/controls for export
   const currentTransform = viewport.getAttribute('transform');
   viewport.removeAttribute('transform');
 
   try {
-    // 2. Prepare the SVG data
     const serializer = new XMLSerializer();
-    const svgData = serializer.serializeToString(canvas);
-    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+    const svgData    = serializer.serializeToString(canvas);
+    const blob       = new Blob([svgData], { type: 'image/svg+xml' });
 
-    // 3. Trigger Local Download immediately (so the user gets their file)
-    // const url = URL.createObjectURL(blob);
-    // const link = document.createElement('a');
-    // link.href = url;
-    // link.download = 'tumbler-design.svg';
-    // link.click();
-    // URL.revokeObjectURL(url);
-
-    // 4. Attempt Cloud Upload
     const fileName = prompt("Enter a name for your design:", "tumbler-design");
     if (fileName) {
       console.log("Attempting cloud upload...");
@@ -402,13 +360,7 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   } catch (error) {
     console.error("Operation failed:", error);
   } finally {
-    // 5. ALWAYS restore the editor view, even if an error happened above
-    if (currentTransform) {
-      viewport.setAttribute('transform', currentTransform);
-    }
+    if (currentTransform) viewport.setAttribute('transform', currentTransform);
     console.log("Editor view restored.");
   }
 });
-
-
-
