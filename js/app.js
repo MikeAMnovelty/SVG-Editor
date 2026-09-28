@@ -75,7 +75,6 @@ function updateViewportTransform() {
   if (activeItem) updateControlsPosition(activeItem);
 }
 
-
 function clientToViewport(clientX, clientY) {
   const pt = canvas.createSVGPoint();
   pt.x = clientX;
@@ -153,7 +152,6 @@ canvas.addEventListener('drop', async e => {
     const doc    = parser.parseFromString(text, 'image/svg+xml');
     const srcSvg = doc.documentElement;
 
-    // Read intrinsic size from the source SVG
     let iw = 0, ih = 0;
     const vb = srcSvg.getAttribute('viewBox');
     if (vb) {
@@ -165,17 +163,15 @@ canvas.addEventListener('drop', async e => {
     }
     if (!iw || !ih) { iw = 100; ih = 100; }
 
-    // Default render width of 72px (1 inch at 72ppi), scale height proportionally
-    const renderW = 72;
+    const renderW = 100;
     const scale   = renderW / iw;
 
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.setAttribute('class', 'canvas-item');
     group.innerHTML = text;
 
-    // Center on drop point
-    group.dataset.x        = dropCoords.x - (iw * scale) / 2;
-    group.dataset.y        = dropCoords.y - (ih * scale) / 2;
+    group.dataset.x        = dropCoords.x;
+    group.dataset.y        = dropCoords.y;
     group.dataset.scale    = scale.toFixed(3);
     group.dataset.rotation = 0;
 
@@ -198,26 +194,11 @@ function updateTransform(el) {
   const scale = parseFloat(el.dataset.scale)    || 1;
   const rot   = parseFloat(el.dataset.rotation) || 0;
 
-  const inner = el.querySelector('svg');
-  let cx = 0, cy = 0;
-  if (inner) {
-    const vb = inner.getAttribute('viewBox');
-    if (vb) {
-      const parts = vb.trim().split(/\s+|,/).map(Number);
-      cx = parts[2] / 2;
-      cy = parts[3] / 2;
-    } else {
-      cx = parseFloat(inner.getAttribute('width')  || 0) / 2;
-      cy = parseFloat(inner.getAttribute('height') || 0) / 2;
-    }
-  }
-
   el.setAttribute(
     'transform',
-    `translate(${x}, \${y}) translate(${cx}, \${cy}) rotate(${rot}) scale(${scale}) translate(${-cx}, \${-cy})`
+    `translate(${x}, \${y}) rotate(${rot}) scale(${scale})`
   );
 }
-
 
 function selectItem(el) {
   document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
