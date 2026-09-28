@@ -1,59 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AMNovelty Tumbler Designer</title>
-  <link rel="stylesheet" href="./css/styles.css">
-  <!-- <link rel="stylesheet" href="./svgedit.css"> -->
-  <style>
-    /* minimal helpers if your CSS doesn't provide them */
-    body { font-family: system-ui, sans-serif; margin: 12px; }
-    .topbar { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
-    .layout { display:flex; gap:12px; }
-    .palette { width:220px; }
-    .workspace { flex:1; }
-    #svgwrap { display:block; border:1px solid #ccc; border-radius:12px; padding:8px; background:#fff; }
-    #svgwrap.dragover { outline:3px dashed #08f; }
-    /*input[type="file"] { margin-bottom:8px; } */
-  </style>
-</head>
-<body>
-  <header class="topbar">
-  <h1>AMNovelty Tumbler Designer</h1>
-  <select id="templateSelect">
-    <option value="40oz">40oz Tumbler</option>
-    <option value="20oz">20oz Tumbler</option>
-    <option value="square">4" Square Coaster</option>
-    <option value="round">4" Round Coaster</option>
-  </select>
-  <a href="https://amnovelty-svg-uploads.s3.amazonaws.com/instructions/user-guide.pdf" target="_blank">
-    Download Instructions
-  </a>
-  <button id="deleteBtn" style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Remove Selected</button>
-  <button id="exportBtn">Upload Design</button>
- </header>
-
-
-  <main class="layout">
-    <aside class="palette">
-      <h2>Artwork</h2>
-      <div id="assetList"></div>
-    </aside>
-
-    <section class="workspace">
-      <div id="svgwrap">
-        <!-- <input id="file" type="file" accept=".svg" multiple /> -->
-        <svg id="canvas"
-             xmlns="http://www.w3.org/2000/svg"
-             width="100%"
-             height="600"
-             style="background:#fff; border-radius:12px; display:block;">
-          <!-- designs drop here -->
-        </svg>
-      </div>
-    </section>
-  </main>
 <script>
 (function(){
   const PPI       = 72;
@@ -91,17 +35,13 @@
     }
   };
 
-  // Active template state — rectangles exposed so drop-targeting still works
   let activeShapes = TEMPLATES['40oz'].shapes;
 
   // ─── Canvas Sizing & Shape Drawing ───────────────────────────────────────
   function drawTemplate(key) {
-    // Clear previous template shapes only
     svg.querySelectorAll('[data-template-shape]').forEach(el => el.remove());
-
     activeShapes = TEMPLATES[key].shapes;
 
-    // Calculate bounding box to size the canvas
     let maxX = 0, maxY = 0;
     for (const s of activeShapes) {
       if (s.type === 'rect') {
@@ -119,8 +59,8 @@
     svg.style.width  = Math.min(widthPx, 1200) + 'px';
     svg.style.height = heightPx + 'px';
 
-    const pad = paddingIn * PPI;
-    const viewport = svg.querySelector('#viewport'); // insert shapes BEFORE viewport
+    const pad      = paddingIn * PPI;
+    const viewport = svg.querySelector('#viewport');
 
     for (const s of activeShapes) {
       const group = document.createElementNS(svgNS, 'g');
@@ -171,14 +111,13 @@
         group.appendChild(inner);
       }
 
-      // Always insert template shapes before the viewport layer
       svg.insertBefore(group, viewport || null);
     }
 
-    showWarning(false); // reset warning on template switch
+    showWarning(false);
   }
 
-  // ─── Fit Transform (unchanged) ────────────────────────────────────────────
+  // ─── Fit Transform ────────────────────────────────────────────────────────
   function computeFitTransform(imgW, imgH, boxX, boxY, boxW, boxH, mode) {
     const pad = paddingIn * PPI;
     const cw = boxW - pad * 2, ch = boxH - pad * 2;
@@ -214,7 +153,6 @@
       boxX = target.xIn * PPI; boxY = target.yIn * PPI;
       boxW = target.wIn * PPI; boxH = target.hIn * PPI;
     } else if (target.type === 'circle') {
-      // treat bounding square of circle as the box
       boxX = (target.cxIn - target.rIn) * PPI;
       boxY = (target.cyIn - target.rIn) * PPI;
       boxW = target.rIn * 2 * PPI;
@@ -252,7 +190,6 @@
     pt.x = e.clientX; pt.y = e.clientY;
     const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
 
-    // Find which shape the drop landed in
     const shapeIndex = activeShapes.findIndex(s => {
       if (s.type === 'rect') {
         const x = s.xIn * PPI, y = s.yIn * PPI;
@@ -287,32 +224,51 @@
     let anyOutside = false;
 
     for (const item of items) {
-      const iRect = item.getBoundingClientRect();
-      let inside  = false;
+      const itemBBox = item.getBBox();
+      const matrix   = item.getCTM();
+      const svgMatrix = svg.getScreenCTM().inverse();
+
+      const corners = [
+        { x: itemBBox.x,                 y: itemBBox.y },
+        { x: itemBBox.x + itemBBox.width, y: itemBBox.y },
+        { x: itemBBox.x,                 y: itemBBox.y + itemBBox.height },
+        { x: itemBBox.x + itemBBox.width, y: itemBBox.y + itemBBox.height }
+      ].map(pt => {
+        const svgPt = svg.createSVGPoint();
+        svgPt.x = pt.x;
+        svgPt.y = pt.y;
+        return svgPt.matrixTransform(matrix).matrixTransform(svgMatrix);
+      });
+
+      const xs = corners.map(p => p.x);
+      const ys = corners.map(p => p.y);
+      const itemSVGBox = {
+        left:   Math.min(...xs),
+        right:  Math.max(...xs),
+        top:    Math.min(...ys),
+        bottom: Math.max(...ys)
+      };
+
+      let inside = false;
 
       for (const s of activeShapes) {
-        const shapeEl = svg.querySelector(`[data-template-shape="${s.id}"] \${s.type === 'circle' ? 'circle' : 'rect'}`);
-        if (!shapeEl) continue;
-        const sRect = shapeEl.getBoundingClientRect();
-
         if (s.type === 'rect') {
-          if (iRect.left >= sRect.left && iRect.right  <= sRect.right &&
-              iRect.top  >= sRect.top  && iRect.bottom <= sRect.bottom) {
-            inside = true; break;
-          }
+          const sx = s.xIn * PPI, sy = s.yIn * PPI;
+          const sw = s.wIn * PPI, sh = s.hIn * PPI;
+          if (
+            itemSVGBox.left   >= sx      &&
+            itemSVGBox.right  <= sx + sw &&
+            itemSVGBox.top    >= sy      &&
+            itemSVGBox.bottom <= sy + sh
+          ) { inside = true; break; }
+
         } else if (s.type === 'circle') {
-          const cx = sRect.left + sRect.width  / 2;
-          const cy = sRect.top  + sRect.height / 2;
-          const r  = sRect.width / 2;
-          const corners = [
-            [iRect.left,  iRect.top],
-            [iRect.right, iRect.top],
-            [iRect.left,  iRect.bottom],
-            [iRect.right, iRect.bottom]
-          ];
-          if (corners.every(([px, py]) => Math.sqrt((px-cx)**2 + (py-cy)**2) <= r)) {
-            inside = true; break;
-          }
+          const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
+          const allIn = corners.every(p => {
+            const dx = p.x - cx, dy = p.y - cy;
+            return Math.sqrt(dx * dx + dy * dy) <= r;
+          });
+          if (allIn) { inside = true; break; }
         }
       }
 
@@ -322,6 +278,7 @@
     showWarning(anyOutside);
   }
 
+  // ─── Warning Banner ───────────────────────────────────────────────────────
   function showWarning(show) {
     let banner = document.getElementById('boundsWarning');
     if (show && !banner) {
@@ -345,22 +302,6 @@
     drawTemplate(e.target.value);
   });
 
-  // ─── Export (unchanged) ───────────────────────────────────────────────────
-  document.getElementById('exportBtn').addEventListener('click', () => {
-    const clone      = svg.cloneNode(true);
-    const serializer = new XMLSerializer();
-    const str        = serializer.serializeToString(clone);
-    const blob       = new Blob([str], { type: 'image/svg+xml' });
-    const url        = URL.createObjectURL(blob);
-    const a          = document.createElement('a');
-    a.href = url;
-    a.download = 'engraving-layout.svg';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
-
   // ─── Expose bounds check to app.js ───────────────────────────────────────
   window.checkArtworkBounds = checkArtworkBounds;
 
@@ -369,7 +310,3 @@
 
 })();
 </script>
-
-<script type="module" src="./js/app.js"></script>
-</body>
-</html>

@@ -316,13 +316,23 @@ function renderControls(el) {
     const initScale = parseFloat(el.dataset.scale) || 1;
 
     const onMove = mv => {
-      // Scale calculation accounts for canvas zoom level
       const dy = (mv.clientY - startY) / viewState.scale;
       const newScale = Math.max(0.1, initScale + dy * 0.01);
       el.dataset.scale = newScale.toFixed(3);
       updateTransform(el);
       updateControlsPosition(el);
+      if (window.checkArtworkBounds) window.checkArtworkBounds(); // ← add this
     };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+
 
     const onUp = () => {
       window.removeEventListener('mousemove', onMove);
