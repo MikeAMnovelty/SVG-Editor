@@ -75,6 +75,7 @@ function updateViewportTransform() {
   if (activeItem) updateControlsPosition(activeItem);
 }
 
+
 function clientToViewport(clientX, clientY) {
   const pt = canvas.createSVGPoint();
   pt.x = clientX;
@@ -197,7 +198,6 @@ function updateTransform(el) {
   const scale = parseFloat(el.dataset.scale)    || 1;
   const rot   = parseFloat(el.dataset.rotation) || 0;
 
-  // Use viewBox for center calculation — reliable before and after render
   const inner = el.querySelector('svg');
   let cx = 0, cy = 0;
   if (inner) {
@@ -217,6 +217,7 @@ function updateTransform(el) {
     `translate(${x}, \${y}) translate(${cx}, \${cy}) rotate(${rot}) scale(${scale}) translate(${-cx}, \${-cy})`
   );
 }
+
 
 function selectItem(el) {
   document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
