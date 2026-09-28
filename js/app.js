@@ -71,9 +71,10 @@ const viewState = {
 };
 
 function updateViewportTransform() {
-  viewport.setAttribute('transform', `translate(${viewState.x}, \${viewState.y}) scale(${viewState.scale})`);
+  viewport.setAttribute('transform', 'translate(' + viewState.x + ', ' + viewState.y + ') scale(' + viewState.scale + ')');
   if (activeItem) updateControlsPosition(activeItem);
 }
+
 
 function clientToViewport(clientX, clientY) {
   const pt = canvas.createSVGPoint();
@@ -200,17 +201,15 @@ function updateTransform(el) {
   const iw    = parseFloat(el.dataset.iw)       || 0;
   const ih    = parseFloat(el.dataset.ih)       || 0;
 
-  // Rotate and scale around the center of the SVG's own coordinate space,
-  // then translate to the drop position. This keeps getCTM() and getBBox()
-  // accurate for checkArtworkBounds.
   const cx = iw / 2;
   const cy = ih / 2;
 
   el.setAttribute(
     'transform',
-    `translate(${x}, \${y}) rotate(${rot}, \${cx}, \${cy}) scale(${scale})`
+    'translate(' + x + ', ' + y + ') rotate(' + rot + ', ' + cx + ', ' + cy + ') scale(' + scale + ')'
   );
 }
+
 
 function selectItem(el) {
   document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
