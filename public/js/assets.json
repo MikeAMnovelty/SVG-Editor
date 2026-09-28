@@ -241,7 +241,7 @@
       {"type": "file", "id": "prince", "name": "Prince", "file": "/asset/prince/prince.svg"},
       {"type": "file", "id": "purplerain", "name": "Purple Rain", "file": "/asset/prince/purplerain.svg"},
       {"type": "file", "id": "star", "name": "Star", "file": "/asset/prince/star.svg"},
-      {"type": "file", "id": "star2", "name": "Star 2", "file": "/asset/prince/start2.svg"}
+      {"type": "file", "id": "star2", "name": "Star 2", "file": "/asset/prince/star2.svg"}
     ]
   }
 ]
