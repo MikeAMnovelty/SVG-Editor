@@ -163,6 +163,7 @@ canvas.addEventListener('drop', async e => {
     }
     if (!iw || !ih) { iw = 100; ih = 100; }
 
+    // Render at 100px wide by default
     const renderW = 100;
     const scale   = renderW / iw;
 
@@ -174,6 +175,9 @@ canvas.addEventListener('drop', async e => {
     group.dataset.y        = dropCoords.y;
     group.dataset.scale    = scale.toFixed(3);
     group.dataset.rotation = 0;
+    // Store intrinsic size so updateTransform can use it
+    group.dataset.iw       = iw;
+    group.dataset.ih       = ih;
 
     viewport.appendChild(group);
     setTimeout(() => {
@@ -193,10 +197,18 @@ function updateTransform(el) {
   const y     = parseFloat(el.dataset.y)        || 0;
   const scale = parseFloat(el.dataset.scale)    || 1;
   const rot   = parseFloat(el.dataset.rotation) || 0;
+  const iw    = parseFloat(el.dataset.iw)       || 0;
+  const ih    = parseFloat(el.dataset.ih)       || 0;
+
+  // Rotate and scale around the center of the SVG's own coordinate space,
+  // then translate to the drop position. This keeps getCTM() and getBBox()
+  // accurate for checkArtworkBounds.
+  const cx = iw / 2;
+  const cy = ih / 2;
 
   el.setAttribute(
     'transform',
-    `translate(${x}, \${y}) rotate(${rot}) scale(${scale})`
+    `translate(${x}, \${y}) rotate(${rot}, \${cx}, \${cy}) scale(${scale})`
   );
 }
 
