@@ -246,6 +246,7 @@ function attachTransformControls(el) {
       el.dataset.y = origY + (currentMouse.y - startMouse.y);
       updateTransform(el);
       updateControlsPosition(el);
+      if (window.checkArtworkBounds) window.checkArtworkBounds();  // ← add this to check if in bounds
     };
 
     const onUp = () => {
