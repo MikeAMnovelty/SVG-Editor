@@ -231,7 +231,17 @@
     "type": "folder",
     "name": "Prince",
     "children": [
-      {"type": "file", "id": "something", "name": "Prince Portrait", "file": "/asset/prince/"}
+      {"type": "file", "id": "1999", "name": "1999", "file": "/asset/prince/1999.svg"},
+      {"type": "file", "id": "beret", "name": "Beret", "file": "/asset/prince/beret.svg"},
+      {"type": "file", "id": "formerPrince", "name": "Artist Formerly...", "file": "/asset/prince/fromerlyprince.svg"},
+      {"type": "file", "id": "guitar", "name": "Guitar", "file": "/asset/prince/guitar.svg"},
+      {"type": "file", "id": "notes", "name": "Music Notes", "file": "/asset/prince/notes.svg"},
+      {"type": "file", "id": "portrit", "name": "Portrait", "file": "/asset/prince/portrait.svg"},
+      {"type": "file", "id": "portrait2", "name": "Portrait 2", "file": "/asset/prince/portrait2.svg"},
+      {"type": "file", "id": "prince", "name": "Prince", "file": "/asset/prince/prince.svg"},
+      {"type": "file", "id": "purplerain", "name": "Purple Rain", "file": "/asset/prince/purplerain.svg"},
+      {"type": "file", "id": "star", "name": "Star", "file": "/asset/prince/star.svg"},
+      {"type": "file", "id": "star2", "name": "Star 2", "file": "/asset/prince/start2.svg"}
     ]
   }
 ]
