@@ -20,13 +20,20 @@
 </head>
 <body>
   <header class="topbar">
-    <h1>AMNovelty Tumbler Designer</h1>
-    <a href="https://amnovelty-svg-uploads.s3.amazonaws.com/instructions/user-guide.pdf" target="_blank">
+  <h1>AMNovelty Tumbler Designer</h1>
+  <select id="templateSelect">
+    <option value="40oz">40oz Tumbler</option>
+    <option value="20oz">20oz Tumbler</option>
+    <option value="square">4" Square Coaster</option>
+    <option value="round">4" Round Coaster</option>
+  </select>
+  <a href="https://amnovelty-svg-uploads.s3.amazonaws.com/instructions/user-guide.pdf" target="_blank">
     Download Instructions
-    </a>
-    <button id="deleteBtn" style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Remove Selected</button>
-    <button id="exportBtn">Upload Design</button>
-  </header>
+  </a>
+  <button id="deleteBtn" style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Remove Selected</button>
+  <button id="exportBtn">Upload Design</button>
+ </header>
+
 
   <main class="layout">
     <aside class="palette">
