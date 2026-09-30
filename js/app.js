@@ -376,6 +376,12 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
       const fileForS3 = new File([blob], `${fileName}.svg`, { type: 'image/svg+xml' });
       await uploadSVGToS3(fileForS3);
       console.log("Cloud upload successful!");
+    
+      // Notify the Shopify parent page that upload is complete
+     window.parent.postMessage({
+      type: 'upload-complete',
+      fileName: `${fileName}.svg`
+     }, '*');
     }
 
   } catch (error) {
