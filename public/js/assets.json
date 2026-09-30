@@ -243,7 +243,7 @@
       {"type": "file", "id": "star", "name": "Star", "file": "/asset/prince/star.svg"},
       {"type": "file", "id": "star2", "name": "Star 2", "file": "/asset/prince/star2.svg"}
     ]
-  }
+  },
   {
     "type": "folder",
     "name": "Oddities",
