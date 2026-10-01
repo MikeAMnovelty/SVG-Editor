@@ -219,16 +219,23 @@ function updateTransform(el) {
   const h   = parseFloat(el.dataset.h)        || 100;
   const rot = parseFloat(el.dataset.rotation) || 0;
 
-  el.setAttribute('x', x);
-  el.setAttribute('y', y);
-  el.setAttribute('width',  w);
-  el.setAttribute('height', h);
-
-  // Rotate around the visual center
   const cx = x + w / 2;
   const cy = y + h / 2;
+
+  // Rotation only on the group, no translate
   el.setAttribute('transform', 'rotate(' + rot + ', ' + cx + ', ' + cy + ')');
+
+  // Position and size live on the nested svg directly
+  const nested = el.querySelector('svg');
+  if (nested) {
+    nested.setAttribute('x',      x);
+    nested.setAttribute('y',      y);
+    nested.setAttribute('width',  w);
+    nested.setAttribute('height', h);
+    nested.setAttribute('overflow', 'hidden');
+  }
 }
+
 
 
 
@@ -286,6 +293,7 @@ function attachTransformControls(el) {
     window.addEventListener('mouseup', onUp);
   });
 }
+
 
 // ─── Overlay UI Handles (Resize & Rotate) ────────────────────────────────────
 function renderControls(el) {
