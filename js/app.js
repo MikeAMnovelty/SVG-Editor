@@ -166,28 +166,41 @@ canvas.addEventListener('drop', async e => {
 
     const renderW = 100;
     const renderH = (ih / iw) * renderW;
+    const scale   = renderW / iw;
 
-    const blob = new Blob([text], { type: 'image/svg+xml' });
-    const url  = URL.createObjectURL(blob);
+    // Wrap content in a group with a viewBox-normalizing nested svg
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('class', 'canvas-item');
 
-    const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
-    img.setAttribute('class', 'canvas-item');
+    // Use a nested <svg> to contain the artwork — this enforces the viewBox
+    // so internal coordinates are always normalized to our renderW/renderH box
+    const nested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    nested.setAttribute('viewBox', '0 0 ' + iw + ' ' + ih);
+    nested.setAttribute('width',  renderW);
+    nested.setAttribute('height', renderH);
+    nested.setAttribute('x', 0);
+    nested.setAttribute('y', 0);
+    nested.setAttribute('overflow', 'visible');
 
-    // Store state
-    img.dataset.x        = dropCoords.x - renderW / 2;  // center on drop point
-    img.dataset.y        = dropCoords.y - renderH / 2;
-    img.dataset.w        = renderW;
-    img.dataset.h        = renderH;
-    img.dataset.rotation = 0;
-    img.dataset.blobUrl  = url;
+    // Copy all child nodes from the source SVG into the nested svg
+    Array.from(srcSvg.childNodes).forEach(child => {
+      nested.appendChild(doc.importNode(child, true));
+    });
 
-    viewport.appendChild(img);
-    updateTransform(img);
+    group.appendChild(nested);
+
+    group.dataset.x        = dropCoords.x - renderW / 2;
+    group.dataset.y        = dropCoords.y - renderH / 2;
+    group.dataset.w        = renderW;
+    group.dataset.h        = renderH;
+    group.dataset.rotation = 0;
+
+    viewport.appendChild(group);
+    updateTransform(group);
 
     setTimeout(() => {
-      attachTransformControls(img);
-      selectItem(img);
+      attachTransformControls(group);
+      selectItem(group);
       if (window.checkArtworkBounds) window.checkArtworkBounds();
     }, 0);
 
@@ -195,6 +208,7 @@ canvas.addEventListener('drop', async e => {
     console.error('Could not load SVG:', file, err);
   }
 });
+
 
 
 // ─── Transform Engine ─────────────────────────────────────────────────────────
