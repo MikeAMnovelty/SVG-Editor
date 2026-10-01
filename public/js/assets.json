@@ -243,5 +243,19 @@
       {"type": "file", "id": "star", "name": "Star", "file": "/asset/prince/star.svg"},
       {"type": "file", "id": "star2", "name": "Star 2", "file": "/asset/prince/star2.svg"}
     ]
+  },
+  {
+    "type": "folder",
+    "name": "Oddities",
+    "children": [
+      {
+        "type": "folder",
+        "name": "Flowers",
+        "children": [
+          {"type": "file", "id": "leaf1", "name": "Leaf 1", "file": "/asset/states/leaf1.svg"},
+          {"type": "file", "id": "leaf2", "name": "Leaf 2", "file": "/asset/states/leaf2.svg"}
+        ]
+    }
+    ]
   }
 ]

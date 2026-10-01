@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50mm"
+   height="50mm"
+   viewBox="0 0 50 50"
+   version="1.1"
+   id="svg4535"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   sodipodi:docname="twistedsister.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4537"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.84096521"
+     inkscape:cx="356.73295"
+     inkscape:cy="313.925"
+     inkscape:window-width="1440"
+     inkscape:window-height="784"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs4532" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path7984"
+       style="fill:#0f0b0b;fill-opacity:1;stroke:#0f0b0b;stroke-width:0.18459;stroke-linecap:round;stroke-opacity:1;paint-order:stroke fill markers"
+       d="M 25.393893,35.84279 33.519017,25.723053 24.220596,14.870003 17.180778,26.104375 Z M 7.2816689,4.1195159 l -2.6963623,4.60456 16.5515244,5e-7 L 10.558789,26.561557 26.073254,45.228697 42.251432,25.731909 32.503043,14.407182 h 7.75723 L 42.085501,9.9270688 27.774031,9.8855888 24.994704,14.033841 34.867543,25.648943 25.409531,37.305531 15.868553,26.229701 26.944388,8.8070439 H 42.541813 L 44.615938,4.119518 Z M 46.865328,2.7556405 6.5037897,2.9902989 2.3971317,10.14752 H 18.002057 L 8.0289376,27.042932 25.980447,48.162474 44.518743,25.987107 35.484254,15.779326 H 41.70284 Z M 6.8627282,3.4252758 45.747634,3.4667031 40.97161,15.048095 34.076305,15.075362 43.580107,25.869655 25.980447,46.637062 9.3196926,26.808275 19.56754,9.4233791 3.7636531,9.2159751 Z" />
+  </g>
+</svg>
