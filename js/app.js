@@ -201,14 +201,16 @@ function updateTransform(el) {
   const iw    = parseFloat(el.dataset.iw)       || 0;
   const ih    = parseFloat(el.dataset.ih)       || 0;
 
-  const cx = iw / 2;
-  const cy = ih / 2;
+  // Center of the element in its own coordinate space after scaling
+  const cx = (iw * scale) / 2;
+  const cy = (ih * scale) / 2;
 
   el.setAttribute(
     'transform',
     'translate(' + x + ', ' + y + ') rotate(' + rot + ', ' + cx + ', ' + cy + ') scale(' + scale + ')'
   );
 }
+
 
 
 function selectItem(el) {
@@ -376,6 +378,12 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
       const fileForS3 = new File([blob], `${fileName}.svg`, { type: 'image/svg+xml' });
       await uploadSVGToS3(fileForS3);
       console.log("Cloud upload successful!");
+    
+      // Notify the Shopify parent page that upload is complete
+     window.parent.postMessage({
+      type: 'upload-complete',
+      fileName: `${fileName}.svg`
+     }, '*');
     }
 
   } catch (error) {
