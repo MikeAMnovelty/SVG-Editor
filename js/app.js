@@ -164,27 +164,31 @@ canvas.addEventListener('drop', async e => {
     }
     if (!iw || !ih) { iw = 100; ih = 100; }
 
-    // Render at 100px wide by default
     const renderW = 100;
-    const scale   = renderW / iw;
+    const renderH = (ih / iw) * renderW;
 
-    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    group.setAttribute('class', 'canvas-item');
-    group.innerHTML = text;
+    const blob = new Blob([text], { type: 'image/svg+xml' });
+    const url  = URL.createObjectURL(blob);
 
-    group.dataset.x        = dropCoords.x;
-    group.dataset.y        = dropCoords.y;
-    group.dataset.scale    = scale.toFixed(3);
-    group.dataset.rotation = 0;
-    // Store intrinsic size so updateTransform can use it
-    group.dataset.iw       = iw;
-    group.dataset.ih       = ih;
+    const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+    img.setAttribute('class', 'canvas-item');
 
-    viewport.appendChild(group);
+    // Store state
+    img.dataset.x        = dropCoords.x - renderW / 2;  // center on drop point
+    img.dataset.y        = dropCoords.y - renderH / 2;
+    img.dataset.w        = renderW;
+    img.dataset.h        = renderH;
+    img.dataset.rotation = 0;
+    img.dataset.blobUrl  = url;
+
+    viewport.appendChild(img);
+    updateTransform(img);
+
     setTimeout(() => {
-      attachTransformControls(group);
-      selectItem(group);
-      setTimeout(() => { if (window.checkArtworkBounds) window.checkArtworkBounds(); }, 50);
+      attachTransformControls(img);
+      selectItem(img);
+      if (window.checkArtworkBounds) window.checkArtworkBounds();
     }, 0);
 
   } catch (err) {
@@ -192,23 +196,24 @@ canvas.addEventListener('drop', async e => {
   }
 });
 
+
 // ─── Transform Engine ─────────────────────────────────────────────────────────
 function updateTransform(el) {
-  const x     = parseFloat(el.dataset.x)        || 0;
-  const y     = parseFloat(el.dataset.y)        || 0;
-  const scale = parseFloat(el.dataset.scale)    || 1;
-  const rot   = parseFloat(el.dataset.rotation) || 0;
-  const iw    = parseFloat(el.dataset.iw)       || 0;
-  const ih    = parseFloat(el.dataset.ih)       || 0;
+  const x   = parseFloat(el.dataset.x)        || 0;
+  const y   = parseFloat(el.dataset.y)        || 0;
+  const w   = parseFloat(el.dataset.w)        || 100;
+  const h   = parseFloat(el.dataset.h)        || 100;
+  const rot = parseFloat(el.dataset.rotation) || 0;
 
-  // Center of the element in its own coordinate space after scaling
-  const cx = (iw * scale) / 2;
-  const cy = (ih * scale) / 2;
+  el.setAttribute('x', x);
+  el.setAttribute('y', y);
+  el.setAttribute('width',  w);
+  el.setAttribute('height', h);
 
-  el.setAttribute(
-    'transform',
-    'translate(' + x + ', ' + y + ') rotate(' + rot + ', ' + cx + ', ' + cy + ') scale(' + scale + ')'
-  );
+  // Rotate around the visual center
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  el.setAttribute('transform', 'rotate(' + rot + ', ' + cx + ', ' + cy + ')');
 }
 
 
@@ -317,27 +322,32 @@ function renderControls(el) {
 
   // Resize
   resizeHandle.addEventListener('mousedown', e => {
-    e.stopPropagation();
-    const startY    = e.clientY;
-    const initScale = parseFloat(el.dataset.scale) || 1;
+  e.stopPropagation();
+  const startX  = e.clientX;
+  const startY  = e.clientY;
+  const initW   = parseFloat(el.dataset.w);
+  const initH   = parseFloat(el.dataset.h);
+  const aspect  = initH / initW;
 
-    const onMove = mv => {
-      const dy       = (mv.clientY - startY) / viewState.scale;
-      const newScale = Math.max(0.1, initScale + dy * 0.01);
-      el.dataset.scale = newScale.toFixed(3);
-      updateTransform(el);
-      updateControlsPosition(el);
-      if (window.checkArtworkBounds) window.checkArtworkBounds();
-    };
+  const onMove = mv => {
+    const dx      = (mv.clientX - startX) / viewState.scale;
+    const newW    = Math.max(10, initW + dx);
+    el.dataset.w  = newW.toFixed(1);
+    el.dataset.h  = (newW * aspect).toFixed(1);
+    updateTransform(el);
+    updateControlsPosition(el);
+    if (window.checkArtworkBounds) window.checkArtworkBounds();
+  };
 
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
+  const onUp = () => {
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+  };
 
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  });
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+});
+
 
   updateControlsPosition(el);
 }
