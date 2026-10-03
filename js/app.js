@@ -271,6 +271,22 @@ function selectTextItem(el) {
   attachTextDrag(el);
 }
 
+// ─── Apply Font to Selected Text Element ─────────────────────────────────────
+window.applyFontToSelected = function(fontName) {
+  const el = activeTextItem;
+  if (!el) return;
+  const textEl = el.querySelector('text');
+  if (!textEl) return;
+  textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
+  el.dataset.fontFamily = fontName;
+
+  const fontBtn = document.getElementById('tb-font-btn');
+  if (fontBtn) {
+    fontBtn.textContent      = fontName;
+    fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
+  }
+};
+
 // ─── Text Item Drag ───────────────────────────────────────────────────────────
 function attachTextDrag(el) {
   // Guard: only attach once
