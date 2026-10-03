@@ -448,12 +448,53 @@ function deleteSelected() {
   }
 }
 
+
+// ─── Keyboard Shortcuts ───────────────────────────────────────────────────────
+let clipboardItem = null;
+
 document.addEventListener('keydown', e => {
+  // Delete / Backspace
   if ((e.key === 'Delete' || e.key === 'Backspace') && (activeItem || activeTextItem)) {
     e.preventDefault();
     deleteSelected();
   }
+  // Copy
+  if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+    if (activeItem) clipboardItem = activeItem;
+  }
+  // Paste
+  if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+    if (clipboardItem) pasteItem(clipboardItem);
+  }
 });
+
+function pasteItem(source) {
+  const clone = source.cloneNode(true);
+
+  clone.dataset.x        = (parseFloat(source.dataset.x) || 0) + 20;
+  clone.dataset.y        = (parseFloat(source.dataset.y) || 0) + 20;
+  clone.dataset.w        = source.dataset.w;
+  clone.dataset.h        = source.dataset.h;
+  clone.dataset.rotation = source.dataset.rotation;
+
+  viewport.appendChild(clone);
+  updateTransform(clone);
+
+  setTimeout(() => {
+    attachTransformControls(clone);
+    selectItem(clone);
+    if (window.checkArtworkBounds) window.checkArtworkBounds();
+  }, 0);
+
+  clipboardItem = clone;
+}
+
+document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
+
+document.getElementById('duplicateBtn').addEventListener('click', () => {
+  if (activeItem) pasteItem(activeItem);
+});
+
 
 document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
 
