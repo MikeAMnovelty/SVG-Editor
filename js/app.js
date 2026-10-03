@@ -56,10 +56,11 @@ function renderNodes(nodes) {
 loadAssets();
 
 // ─── Canvas & Viewport Setup ──────────────────────────────────────────────────
-const canvas = document.getElementById('canvas');
+const canvas   = document.getElementById('canvas');
 const viewport = canvas.querySelector('#viewport');
 
-let activeItem = null;
+let activeItem     = null;
+let activeTextItem = null;   // tracks the currently selected text element
 
 const viewState = {
   scale: 1,
@@ -71,10 +72,10 @@ const viewState = {
 };
 
 function updateViewportTransform() {
-  viewport.setAttribute('transform', 'translate(' + viewState.x + ', ' + viewState.y + ') scale(' + viewState.scale + ')');
+  viewport.setAttribute('transform',
+    'translate(' + viewState.x + ', ' + viewState.y + ') scale(' + viewState.scale + ')');
   if (activeItem) updateControlsPosition(activeItem);
 }
-
 
 function clientToViewport(clientX, clientY) {
   const pt = canvas.createSVGPoint();
@@ -87,17 +88,17 @@ function clientToViewport(clientX, clientY) {
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   const zoomFactor = 1.1;
-  const direction = e.deltaY < 0 ? 1 : -1;
-  const factor = direction > 0 ? zoomFactor : 1 / zoomFactor;
-  const newScale = Math.min(Math.max(viewState.scale * factor, 0.1), 10);
+  const direction  = e.deltaY < 0 ? 1 : -1;
+  const factor     = direction > 0 ? zoomFactor : 1 / zoomFactor;
+  const newScale   = Math.min(Math.max(viewState.scale * factor, 0.1), 10);
   if (newScale === viewState.scale) return;
 
-  const rect = canvas.getBoundingClientRect();
+  const rect   = canvas.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
 
-  viewState.x = mouseX - (mouseX - viewState.x) * (newScale / viewState.scale);
-  viewState.y = mouseY - (mouseY - viewState.y) * (newScale / viewState.scale);
+  viewState.x     = mouseX - (mouseX - viewState.x) * (newScale / viewState.scale);
+  viewState.y     = mouseY - (mouseY - viewState.y) * (newScale / viewState.scale);
   viewState.scale = newScale;
   updateViewportTransform();
 }, { passive: false });
@@ -166,23 +167,18 @@ canvas.addEventListener('drop', async e => {
 
     const renderW = 100;
     const renderH = (ih / iw) * renderW;
-    const scale   = renderW / iw;
 
-    // Wrap content in a group with a viewBox-normalizing nested svg
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.setAttribute('class', 'canvas-item');
 
-    // Use a nested <svg> to contain the artwork — this enforces the viewBox
-    // so internal coordinates are always normalized to our renderW/renderH box
     const nested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     nested.setAttribute('viewBox', '0 0 ' + iw + ' ' + ih);
-    nested.setAttribute('width',  renderW);
-    nested.setAttribute('height', renderH);
-    nested.setAttribute('x', 0);
-    nested.setAttribute('y', 0);
+    nested.setAttribute('width',    renderW);
+    nested.setAttribute('height',   renderH);
+    nested.setAttribute('x',        0);
+    nested.setAttribute('y',        0);
     nested.setAttribute('overflow', 'visible');
 
-    // Copy all child nodes from the source SVG into the nested svg
     Array.from(srcSvg.childNodes).forEach(child => {
       nested.appendChild(doc.importNode(child, true));
     });
@@ -209,8 +205,6 @@ canvas.addEventListener('drop', async e => {
   }
 });
 
-
-
 // ─── Transform Engine ─────────────────────────────────────────────────────────
 function updateTransform(el) {
   const x   = parseFloat(el.dataset.x)        || 0;
@@ -222,45 +216,139 @@ function updateTransform(el) {
   const cx = x + w / 2;
   const cy = y + h / 2;
 
-  // Rotation only on the group, no translate
   el.setAttribute('transform', 'rotate(' + rot + ', ' + cx + ', ' + cy + ')');
 
-  // Position and size live on the nested svg directly
   const nested = el.querySelector('svg');
   if (nested) {
-    nested.setAttribute('x',      x);
-    nested.setAttribute('y',      y);
-    nested.setAttribute('width',  w);
-    nested.setAttribute('height', h);
+    nested.setAttribute('x',        x);
+    nested.setAttribute('y',        y);
+    nested.setAttribute('width',    w);
+    nested.setAttribute('height',   h);
     nested.setAttribute('overflow', 'hidden');
   }
 }
 
-
-
-
+// ─── Select Item ──────────────────────────────────────────────────────────────
 function selectItem(el) {
   document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
   activeItem = el;
+
+  // If we're selecting a non-text item, clear the text toolbar
+  if (el && !el.classList.contains('text-item')) {
+    hideTextToolbar();
+  }
+
+  // If we're clicking away entirely, also hide text toolbar
+  if (!el) {
+    hideTextToolbar();
+  }
+
   if (!el) return;
   renderControls(el);
 }
 
+// ─── Text Item Selection ──────────────────────────────────────────────────────
+function selectTextItem(el) {
+  // Deselect any artwork item
+  document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
+  activeItem     = null;
+  activeTextItem = el;
+  window._selectedTextEl = el;
+
+  // Sync toolbar state
+  const toolbar   = document.getElementById('text-toolbar');
+  const fontBtn   = document.getElementById('tb-font-btn');
+  const sizeLabel = document.getElementById('tb-size-label');
+
+  if (fontBtn)   {
+    fontBtn.textContent      = el.dataset.fontFamily || 'Font';
+    fontBtn.style.fontFamily = `'${el.dataset.fontFamily}', sans-serif`;
+  }
+  if (sizeLabel) sizeLabel.textContent = (el.dataset.fontSize || 36) + 'px';
+  if (toolbar)   toolbar.style.display = 'flex';
+
+  // Make text items draggable via mousedown
+  attachTextDrag(el);
+}
+
+// ─── Text Item Drag ───────────────────────────────────────────────────────────
+function attachTextDrag(el) {
+  // Guard: only attach once
+  if (el._dragAttached) return;
+  el._dragAttached = true;
+
+  el.style.cursor = 'move';
+
+  el.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    selectTextItem(el);
+
+    const startMouse = clientToViewport(e.clientX, e.clientY);
+    const nested     = el.querySelector('svg');
+    const origX      = parseFloat(nested.getAttribute('x')) || 0;
+    const origY      = parseFloat(nested.getAttribute('y')) || 0;
+
+    const onMove = mv => {
+      const cur  = clientToViewport(mv.clientX, mv.clientY);
+      const newX = origX + (cur.x - startMouse.x);
+      const newY = origY + (cur.y - startMouse.y);
+      nested.setAttribute('x', newX);
+      nested.setAttribute('y', newY);
+      el.dataset.x = newX;
+      el.dataset.y = newY;
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup',   onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup',   onUp);
+  });
+}
+
+// ─── Hide Text Toolbar ────────────────────────────────────────────────────────
+function hideTextToolbar() {
+  const toolbar = document.getElementById('text-toolbar');
+  if (toolbar) toolbar.style.display = 'none';
+  activeTextItem         = null;
+  window._selectedTextEl = null;
+}
+
+// ─── Delete Selected (artwork or text) ────────────────────────────────────────
 function deleteSelected() {
-  if (!activeItem) return;
-  activeItem.remove();
-  selectItem(null);
-  if (window.checkArtworkBounds) window.checkArtworkBounds();
+  if (activeItem) {
+    activeItem.remove();
+    selectItem(null);
+    if (window.checkArtworkBounds) window.checkArtworkBounds();
+    return;
+  }
+  if (activeTextItem) {
+    activeTextItem.remove();
+    hideTextToolbar();
+  }
 }
 
 document.addEventListener('keydown', e => {
-  if ((e.key === 'Delete' || e.key === 'Backspace') && activeItem) {
+  if ((e.key === 'Delete' || e.key === 'Backspace') && (activeItem || activeTextItem)) {
     e.preventDefault();
     deleteSelected();
   }
 });
 
 document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
+
+// ─── Text Item Click-to-Select ────────────────────────────────────────────────
+// Delegated listener on the viewport so it catches all present and future text items
+viewport.addEventListener('mousedown', e => {
+  const textItem = e.target.closest('.text-item');
+  if (textItem) {
+    e.stopPropagation();
+    selectTextItem(textItem);
+  }
+});
 
 // ─── Transform & Interaction Controls ────────────────────────────────────────
 function attachTransformControls(el) {
@@ -272,8 +360,8 @@ function attachTransformControls(el) {
     selectItem(el);
 
     const startMouse = clientToViewport(e.clientX, e.clientY);
-    const origX = parseFloat(el.dataset.x);
-    const origY = parseFloat(el.dataset.y);
+    const origX      = parseFloat(el.dataset.x);
+    const origY      = parseFloat(el.dataset.y);
 
     const onMove = mv => {
       const currentMouse = clientToViewport(mv.clientX, mv.clientY);
@@ -286,14 +374,13 @@ function attachTransformControls(el) {
 
     const onUp = () => {
       window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('mouseup',   onUp);
     };
 
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    window.addEventListener('mouseup',   onUp);
   });
 }
-
 
 // ─── Overlay UI Handles (Resize & Rotate) ────────────────────────────────────
 function renderControls(el) {
@@ -301,17 +388,17 @@ function renderControls(el) {
   controlsGroup.setAttribute('class', 'ui-controls');
 
   const rotHandle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  rotHandle.setAttribute('r', '7');
-  rotHandle.setAttribute('fill', '#007bff');
-  rotHandle.setAttribute('stroke', '#fff');
+  rotHandle.setAttribute('r',            '7');
+  rotHandle.setAttribute('fill',         '#007bff');
+  rotHandle.setAttribute('stroke',       '#fff');
   rotHandle.setAttribute('stroke-width', '2');
   rotHandle.style.cursor = 'grab';
 
   const resizeHandle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  resizeHandle.setAttribute('width', '12');
-  resizeHandle.setAttribute('height', '12');
-  resizeHandle.setAttribute('fill', '#28a745');
-  resizeHandle.setAttribute('stroke', '#fff');
+  resizeHandle.setAttribute('width',        '12');
+  resizeHandle.setAttribute('height',       '12');
+  resizeHandle.setAttribute('fill',         '#28a745');
+  resizeHandle.setAttribute('stroke',       '#fff');
   resizeHandle.setAttribute('stroke-width', '2');
   resizeHandle.style.cursor = 'nwse-resize';
 
@@ -327,7 +414,7 @@ function renderControls(el) {
     const centerY = bbox.top  + bbox.height / 2;
 
     const onMove = mv => {
-      const radians = Math.atan2(mv.clientY - centerY, mv.clientX - centerX);
+      const radians       = Math.atan2(mv.clientY - centerY, mv.clientX - centerX);
       el.dataset.rotation = radians * (180 / Math.PI) - 90;
       updateTransform(el);
       updateControlsPosition(el);
@@ -335,41 +422,39 @@ function renderControls(el) {
 
     const onUp = () => {
       window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('mouseup',   onUp);
     };
 
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    window.addEventListener('mouseup',   onUp);
   });
 
   // Resize
   resizeHandle.addEventListener('mousedown', e => {
-  e.stopPropagation();
-  const startX  = e.clientX;
-  const startY  = e.clientY;
-  const initW   = parseFloat(el.dataset.w);
-  const initH   = parseFloat(el.dataset.h);
-  const aspect  = initH / initW;
+    e.stopPropagation();
+    const startX = e.clientX;
+    const initW  = parseFloat(el.dataset.w);
+    const initH  = parseFloat(el.dataset.h);
+    const aspect = initH / initW;
 
-  const onMove = mv => {
-    const dx      = (mv.clientX - startX) / viewState.scale;
-    const newW    = Math.max(10, initW + dx);
-    el.dataset.w  = newW.toFixed(1);
-    el.dataset.h  = (newW * aspect).toFixed(1);
-    updateTransform(el);
-    updateControlsPosition(el);
-    if (window.checkArtworkBounds) window.checkArtworkBounds();
-  };
+    const onMove = mv => {
+      const dx     = (mv.clientX - startX) / viewState.scale;
+      const newW   = Math.max(10, initW + dx);
+      el.dataset.w = newW.toFixed(1);
+      el.dataset.h = (newW * aspect).toFixed(1);
+      updateTransform(el);
+      updateControlsPosition(el);
+      if (window.checkArtworkBounds) window.checkArtworkBounds();
+    };
 
-  const onUp = () => {
-    window.removeEventListener('mousemove', onMove);
-    window.removeEventListener('mouseup', onUp);
-  };
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup',   onUp);
+    };
 
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onUp);
-});
-
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup',   onUp);
+  });
 
   updateControlsPosition(el);
 }
@@ -388,13 +473,14 @@ function updateControlsPosition(el) {
 
   controls.querySelector('circle').setAttribute('cx', left + width / 2);
   controls.querySelector('circle').setAttribute('cy', top - 15);
-  controls.querySelector('rect').setAttribute('x', left + width  - 6);
-  controls.querySelector('rect').setAttribute('y', top  + height - 6);
+  controls.querySelector('rect').setAttribute('x',    left + width  - 6);
+  controls.querySelector('rect').setAttribute('y',    top  + height - 6);
 }
 
 // ─── Export & Upload to S3 ────────────────────────────────────────────────────
 document.getElementById('exportBtn').addEventListener('click', async () => {
   selectItem(null);
+  hideTextToolbar();
 
   const currentTransform = viewport.getAttribute('transform');
   viewport.removeAttribute('transform');
@@ -404,24 +490,23 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     const svgData    = serializer.serializeToString(canvas);
     const blob       = new Blob([svgData], { type: 'image/svg+xml' });
 
-    const fileName = prompt("Enter a name for your design:", "tumbler-design");
+    const fileName = prompt('Enter a name for your design:', 'tumbler-design');
     if (fileName) {
-      console.log("Attempting cloud upload...");
+      console.log('Attempting cloud upload...');
       const fileForS3 = new File([blob], `${fileName}.svg`, { type: 'image/svg+xml' });
       await uploadSVGToS3(fileForS3);
-      console.log("Cloud upload successful!");
-    
-      // Notify the Shopify parent page that upload is complete
-     window.parent.postMessage({
-      type: 'upload-complete',
-      fileName: `${fileName}.svg`
-     }, '*');
+      console.log('Cloud upload successful!');
+
+      window.parent.postMessage({
+        type:     'upload-complete',
+        fileName: `${fileName}.svg`
+      }, '*');
     }
 
   } catch (error) {
-    console.error("Operation failed:", error);
+    console.error('Operation failed:', error);
   } finally {
     if (currentTransform) viewport.setAttribute('transform', currentTransform);
-    console.log("Editor view restored.");
+    console.log('Editor view restored.');
   }
 });
