@@ -264,9 +264,12 @@ function selectTextItem(el) {
 
 // ─── Apply Font to Selected Text Element ─────────────────────────────────────
 window.applyFontToSelected = function(fontName) {
+  console.log('applyFontToSelected called with:', fontName);
+  console.log('activeTextItem is:', activeTextItem);
   const el = activeTextItem;
-  if (!el) return;
+  if (!el) { console.warn('No activeTextItem — returning early'); return; }
   const textEl = el.querySelector('text');
+  console.log('textEl found:', textEl);
   if (!textEl) return;
   textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
   el.dataset.fontFamily = fontName;
@@ -277,6 +280,7 @@ window.applyFontToSelected = function(fontName) {
     fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
   }
 };
+
 
 // ─── Text Item Drag ───────────────────────────────────────────────────────────
 function attachTextDrag(el) {
