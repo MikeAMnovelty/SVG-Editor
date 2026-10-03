@@ -58,9 +58,11 @@ loadAssets();
 // ─── Canvas & Viewport Setup ──────────────────────────────────────────────────
 const canvas   = document.getElementById('canvas');
 const viewport = canvas.querySelector('#viewport');
+const svgNS    = 'http://www.w3.org/2000/svg';
+const PPI      = 72;
 
 let activeItem     = null;
-let activeTextItem = null;   // tracks the currently selected text element
+let activeTextItem = null;
 
 const viewState = {
   scale: 1,
@@ -168,10 +170,10 @@ canvas.addEventListener('drop', async e => {
     const renderW = 100;
     const renderH = (ih / iw) * renderW;
 
-    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const group = document.createElementNS(svgNS, 'g');
     group.setAttribute('class', 'canvas-item');
 
-    const nested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const nested = document.createElementNS(svgNS, 'svg');
     nested.setAttribute('viewBox', '0 0 ' + iw + ' ' + ih);
     nested.setAttribute('width',    renderW);
     nested.setAttribute('height',   renderH);
@@ -233,41 +235,30 @@ function selectItem(el) {
   document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
   activeItem = el;
 
-  // If we're selecting a non-text item, clear the text toolbar
-  if (el && !el.classList.contains('text-item')) {
-    hideTextToolbar();
-  }
-
-  // If we're clicking away entirely, also hide text toolbar
-  if (!el) {
-    hideTextToolbar();
-  }
-
+  if (el && !el.classList.contains('text-item')) hideTextToolbar();
+  if (!el) hideTextToolbar();
   if (!el) return;
+
   renderControls(el);
 }
 
 // ─── Text Item Selection ──────────────────────────────────────────────────────
 function selectTextItem(el) {
-  // Deselect any artwork item
   document.querySelectorAll('.ui-controls').forEach(ctrl => ctrl.remove());
   activeItem     = null;
   activeTextItem = el;
-  window._selectedTextEl = el;
 
-  // Sync toolbar state
   const toolbar   = document.getElementById('text-toolbar');
   const fontBtn   = document.getElementById('tb-font-btn');
   const sizeLabel = document.getElementById('tb-size-label');
 
-  if (fontBtn)   {
+  if (fontBtn) {
     fontBtn.textContent      = el.dataset.fontFamily || 'Font';
     fontBtn.style.fontFamily = `'${el.dataset.fontFamily}', sans-serif`;
   }
   if (sizeLabel) sizeLabel.textContent = (el.dataset.fontSize || 36) + 'px';
   if (toolbar)   toolbar.style.display = 'flex';
 
-  // Make text items draggable via mousedown
   attachTextDrag(el);
 }
 
@@ -289,11 +280,9 @@ window.applyFontToSelected = function(fontName) {
 
 // ─── Text Item Drag ───────────────────────────────────────────────────────────
 function attachTextDrag(el) {
-  // Guard: only attach once
   if (el._dragAttached) return;
   el._dragAttached = true;
-
-  el.style.cursor = 'move';
+  el.style.cursor  = 'move';
 
   el.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
@@ -329,9 +318,117 @@ function attachTextDrag(el) {
 function hideTextToolbar() {
   const toolbar = document.getElementById('text-toolbar');
   if (toolbar) toolbar.style.display = 'none';
-  activeTextItem         = null;
-  window._selectedTextEl = null;
+  activeTextItem = null;
 }
+
+// ─── Get Snap Target ─────────────────────────────────────────────────────────
+function getSnapTarget() {
+  // Read the active template shapes exposed by index.html
+  const shapes = window.activeShapes;
+  if (!shapes || shapes.length === 0) return null;
+  const s = shapes[0];
+  if (s.type === 'rect') {
+    return {
+      x: s.xIn * PPI,
+      y: s.yIn * PPI,
+      w: s.wIn * PPI,
+      h: s.hIn * PPI
+    };
+  } else if (s.type === 'circle') {
+    const r = s.rIn * PPI;
+    return {
+      x: (s.cxIn - s.rIn) * PPI,
+      y: (s.cyIn - s.rIn) * PPI,
+      w: r * 2,
+      h: r * 2
+    };
+  }
+  return null;
+}
+
+// ─── Add Text Element ─────────────────────────────────────────────────────────
+function addTextElement() {
+  const target      = getSnapTarget();
+  const defaultFont = 'Blackcraft';
+  const fontSize    = 36;
+
+  const x = target ? target.x : 100;
+  const y = target ? target.y : 100;
+  const w = target ? target.w : 200;
+  const h = target ? target.h : 60;
+
+  const g = document.createElementNS(svgNS, 'g');
+  g.classList.add('canvas-item', 'text-item');
+  g.dataset.fontFamily = defaultFont;
+  g.dataset.fontSize   = fontSize;
+  g.dataset.x          = x;
+  g.dataset.y          = y;
+  g.dataset.w          = w;
+  g.dataset.h          = h;
+  g.dataset.rotation   = 0;
+
+  const nested = document.createElementNS(svgNS, 'svg');
+  nested.setAttribute('x',        x);
+  nested.setAttribute('y',        y);
+  nested.setAttribute('width',    w);
+  nested.setAttribute('height',   h);
+  nested.setAttribute('overflow', 'visible');
+
+  const textEl = document.createElementNS(svgNS, 'text');
+  textEl.setAttribute('x',                '50%');
+  textEl.setAttribute('y',                '50%');
+  textEl.setAttribute('dominant-baseline', 'middle');
+  textEl.setAttribute('text-anchor',       'middle');
+  textEl.setAttribute('fill',              '#000000');
+  textEl.setAttribute('font-family',       `'${defaultFont}', sans-serif`);
+  textEl.setAttribute('font-size',         fontSize);
+  textEl.textContent = 'Your Text Here';
+
+  nested.appendChild(textEl);
+  g.appendChild(nested);
+  viewport.appendChild(g);
+
+  selectTextItem(g);
+}
+
+// ─── Text Toolbar Button Listeners ───────────────────────────────────────────
+document.getElementById('addTextBtn').addEventListener('click', addTextElement);
+
+document.getElementById('tb-font-btn').addEventListener('click', () => {
+  const panel = document.getElementById('font-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('tb-size-down').addEventListener('click', () => {
+  if (!activeTextItem) return;
+  const textEl = activeTextItem.querySelector('text');
+  const size   = Math.max(6, parseFloat(activeTextItem.dataset.fontSize) - 2);
+  activeTextItem.dataset.fontSize = size;
+  textEl.setAttribute('font-size', size);
+  document.getElementById('tb-size-label').textContent = size + 'px';
+});
+
+document.getElementById('tb-size-up').addEventListener('click', () => {
+  if (!activeTextItem) return;
+  const textEl = activeTextItem.querySelector('text');
+  const size   = Math.min(300, parseFloat(activeTextItem.dataset.fontSize) + 2);
+  activeTextItem.dataset.fontSize = size;
+  textEl.setAttribute('font-size', size);
+  document.getElementById('tb-size-label').textContent = size + 'px';
+});
+
+document.getElementById('tb-edit-btn').addEventListener('click', () => {
+  if (!activeTextItem) return;
+  const textEl  = activeTextItem.querySelector('text');
+  const newText = window.prompt('Edit text:', textEl.textContent);
+  if (newText !== null) textEl.textContent = newText;
+});
+
+document.getElementById('tb-delete-btn').addEventListener('click', () => {
+  if (!activeTextItem) return;
+  activeTextItem.remove();
+  hideTextToolbar();
+});
 
 // ─── Delete Selected (artwork or text) ────────────────────────────────────────
 function deleteSelected() {
@@ -357,7 +454,6 @@ document.addEventListener('keydown', e => {
 document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
 
 // ─── Text Item Click-to-Select ────────────────────────────────────────────────
-// Delegated listener on the viewport so it catches all present and future text items
 viewport.addEventListener('mousedown', e => {
   const textItem = e.target.closest('.text-item');
   if (textItem) {
@@ -400,17 +496,17 @@ function attachTransformControls(el) {
 
 // ─── Overlay UI Handles (Resize & Rotate) ────────────────────────────────────
 function renderControls(el) {
-  const controlsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const controlsGroup = document.createElementNS(svgNS, 'g');
   controlsGroup.setAttribute('class', 'ui-controls');
 
-  const rotHandle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const rotHandle = document.createElementNS(svgNS, 'circle');
   rotHandle.setAttribute('r',            '7');
   rotHandle.setAttribute('fill',         '#007bff');
   rotHandle.setAttribute('stroke',       '#fff');
   rotHandle.setAttribute('stroke-width', '2');
   rotHandle.style.cursor = 'grab';
 
-  const resizeHandle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const resizeHandle = document.createElementNS(svgNS, 'rect');
   resizeHandle.setAttribute('width',        '12');
   resizeHandle.setAttribute('height',       '12');
   resizeHandle.setAttribute('fill',         '#28a745');
