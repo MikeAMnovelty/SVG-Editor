@@ -524,9 +524,10 @@ document.addEventListener('DOMContentLoaded', function () {
         item.textContent = font.name;
         item.style.fontFamily = `'${font.name}', sans-serif`;
         item.addEventListener('click', () => {
-          applyFontToSelected(font.name);
-          document.getElementById('font-panel').style.display = 'none';
+        if (window.applyFontToSelected) window.applyFontToSelected(font.name);
+        document.getElementById('font-panel').style.display = 'none';
         });
+
         list.appendChild(item);
       });
 
@@ -547,19 +548,19 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // ─── Apply Font to Selected Text Element ──────────────────────────────────
-  function applyFontToSelected(fontName) {
-    const el = window._selectedTextEl;
-    if (!el) return;
-    const textEl = el.querySelector('text');
-    if (!textEl) return;
-    textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
-    el.dataset.fontFamily = fontName;
-    const fontBtn = document.getElementById('tb-font-btn');
-    if (fontBtn) {
-      fontBtn.textContent = fontName;
-      fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
-    }
-  }
+  //function applyFontToSelected(fontName) {
+    //const el = window._selectedTextEl;
+    //if (!el) return;
+    //const textEl = el.querySelector('text');
+    //if (!textEl) return;
+    //textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
+    //el.dataset.fontFamily = fontName;
+    //const fontBtn = document.getElementById('tb-font-btn');
+    //if (fontBtn) {
+      //fontBtn.textContent = fontName;
+      //fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
+    //}
+  //}
 
   // ─── Get Snap Target (first rect shape, or canvas centre fallback) ─────────
   function getSnapTarget() {
