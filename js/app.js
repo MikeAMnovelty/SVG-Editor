@@ -264,12 +264,9 @@ function selectTextItem(el) {
 
 // ─── Apply Font to Selected Text Element ─────────────────────────────────────
 window.applyFontToSelected = function(fontName) {
-  console.log('applyFontToSelected called with:', fontName);
-  console.log('activeTextItem is:', activeTextItem);
   const el = activeTextItem;
-  if (!el) { console.warn('No activeTextItem — returning early'); return; }
+  if (!el) return;
   const textEl = el.querySelector('text');
-  console.log('textEl found:', textEl);
   if (!textEl) return;
   textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
   el.dataset.fontFamily = fontName;
@@ -280,7 +277,6 @@ window.applyFontToSelected = function(fontName) {
     fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
   }
 };
-
 
 // ─── Text Item Drag ───────────────────────────────────────────────────────────
 function attachTextDrag(el) {
@@ -327,7 +323,6 @@ function hideTextToolbar() {
 
 // ─── Get Snap Target ─────────────────────────────────────────────────────────
 function getSnapTarget() {
-  // Read the active template shapes exposed by index.html
   const shapes = window.activeShapes;
   if (!shapes || shapes.length === 0) return null;
   const s = shapes[0];
@@ -448,7 +443,6 @@ function deleteSelected() {
   }
 }
 
-
 // ─── Keyboard Shortcuts ───────────────────────────────────────────────────────
 let clipboardItem = null;
 
@@ -494,9 +488,6 @@ document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
 document.getElementById('duplicateBtn').addEventListener('click', () => {
   if (activeItem) pasteItem(activeItem);
 });
-
-
-document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
 
 // ─── Text Item Click-to-Select ────────────────────────────────────────────────
 viewport.addEventListener('mousedown', e => {
@@ -634,6 +625,74 @@ function updateControlsPosition(el) {
   controls.querySelector('rect').setAttribute('y',    top  + height - 6);
 }
 
+// ─── Embed Fonts into SVG Before Export ──────────────────────────────────────
+async function embedFontsIntoSVG() {
+  // Collect all unique font families used by text items
+  const usedFonts = new Set();
+  document.querySelectorAll('.text-item').forEach(el => {
+    if (el.dataset.fontFamily) usedFonts.add(el.dataset.fontFamily);
+  });
+
+  if (usedFonts.size === 0) return;
+
+  // Fetch fonts.json to find the file path for each used font
+  const res  = await fetch('/js/fonts.json');
+  const data = await res.json();
+
+  // Flatten nested folder structure
+  function flattenFonts(nodes) {
+    const result = [];
+    nodes.forEach(n => {
+      if (n.type === 'folder') result.push(...flattenFonts(n.children || []));
+      else if (n.type === 'file') result.push(n);
+    });
+    return result;
+  }
+  const allFonts = flattenFonts(data);
+
+  // Build @font-face rules with base64 encoded font data
+  let styleContent = '';
+  for (const fontName of usedFonts) {
+    const fontEntry = allFonts.find(f => f.name === fontName);
+    if (!fontEntry) continue;
+
+    try {
+      const fontRes    = await fetch(fontEntry.file);
+      const fontBuffer = await fontRes.arrayBuffer();
+      const base64     = btoa(String.fromCharCode(...new Uint8Array(fontBuffer)));
+      const ext        = fontEntry.file.split('.').pop().toLowerCase();
+      const mimeMap    = {
+        woff2: 'font/woff2',
+        woff:  'font/woff',
+        ttf:   'font/truetype',
+        otf:   'font/opentype'
+      };
+      const mime   = mimeMap[ext] || 'font/woff2';
+      const format = ext === 'ttf' ? 'truetype' : ext;
+
+      styleContent += `
+        @font-face {
+          font-family: '${fontName}';
+          src: url('data:${mime};base64,${base64}') format('${format}');
+        }
+      `;
+    } catch (err) {
+      console.warn('Could not embed font:', fontName, err);
+    }
+  }
+
+  if (!styleContent) return;
+
+  // Remove any previously injected style block, then insert fresh one
+  const existing = canvas.querySelector('style#embedded-fonts');
+  if (existing) existing.remove();
+
+  const styleEl = document.createElementNS(svgNS, 'style');
+  styleEl.setAttribute('id', 'embedded-fonts');
+  styleEl.textContent = styleContent;
+  canvas.insertBefore(styleEl, canvas.firstChild);
+}
+
 // ─── Export & Upload to S3 ────────────────────────────────────────────────────
 document.getElementById('exportBtn').addEventListener('click', async () => {
   selectItem(null);
@@ -643,6 +702,9 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   viewport.removeAttribute('transform');
 
   try {
+    // Embed any used fonts as base64 before serializing
+    await embedFontsIntoSVG();
+
     const serializer = new XMLSerializer();
     const svgData    = serializer.serializeToString(canvas);
     const blob       = new Blob([svgData], { type: 'image/svg+xml' });
@@ -663,6 +725,10 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   } catch (error) {
     console.error('Operation failed:', error);
   } finally {
+    // Remove embedded font style so it doesn't persist in the live editor
+    const embedded = canvas.querySelector('style#embedded-fonts');
+    if (embedded) embedded.remove();
+
     if (currentTransform) viewport.setAttribute('transform', currentTransform);
     console.log('Editor view restored.');
   }
