@@ -174,523 +174,385 @@
     <button id="tb-delete-btn" title="Remove text">🗑️</button>
   </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const PPI       = 72;
-  const paddingIn = 0.125;
-  const fitMode   = 'contain';
-  const svgNS     = 'http://www.w3.org/2000/svg';
-  const svg       = document.getElementById('canvas');
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const PPI       = 72;
+    const paddingIn = 0.125;
+    const fitMode   = 'contain';
+    const svgNS     = 'http://www.w3.org/2000/svg';
+    const svg       = document.getElementById('canvas');
 
-  // ─── Template Definitions ──────────────────────────────────────────────────
-  const TEMPLATES = {
-    '40oz': {
-      label: '40oz Tumbler',
-      shapes: [
-        { id: 'r1', type: 'rect', wIn: 12.375, hIn: 5.25, xIn: 0.5, yIn: 0.5 },
-        { id: 'r2', type: 'rect', wIn: 10.125, hIn: 3,    xIn: 0.5, yIn: 6.5 }
-      ]
-    },
-    '20oz': {
-      label: '20oz Tumbler',
-      shapes: [
-        { id: 'r1', type: 'rect', wIn: 10.125, hIn: 5.25, xIn: 0.5, yIn: 0.5 }
-      ]
-    },
-    'square': {
-      label: '4" Square Coaster',
-      shapes: [
-        { id: 'r1', type: 'rect', wIn: 4.0, hIn: 4.0, xIn: 0.5, yIn: 0.5 }
-      ]
-    },
-    'round': {
-      label: '4" Round Coaster',
-      shapes: [
-        { id: 'r1', type: 'circle', rIn: 2.0, cxIn: 2.5, cyIn: 2.5 }
-      ]
-    }
-  };
-
-  let activeShapes = TEMPLATES['40oz'].shapes;
-
-  // ─── Canvas Sizing & Shape Drawing ────────────────────────────────────────
-  function drawTemplate(key) {
-    svg.querySelectorAll('[data-template-shape]').forEach(el => el.remove());
-    activeShapes = TEMPLATES[key].shapes;
-
-    let maxX = 0, maxY = 0;
-    for (const s of activeShapes) {
-      if (s.type === 'rect') {
-        maxX = Math.max(maxX, s.xIn + s.wIn + 0.5);
-        maxY = Math.max(maxY, s.yIn + s.hIn + 0.5);
-      } else if (s.type === 'circle') {
-        maxX = Math.max(maxX, s.cxIn + s.rIn + 0.5);
-        maxY = Math.max(maxY, s.cyIn + s.rIn + 0.5);
+    // ─── Template Definitions ────────────────────────────────────────────────
+    const TEMPLATES = {
+      '40oz': {
+        label: '40oz Tumbler',
+        shapes: [
+          { id: 'r1', type: 'rect', wIn: 12.375, hIn: 5.25, xIn: 0.5, yIn: 0.5 },
+          { id: 'r2', type: 'rect', wIn: 10.125, hIn: 3,    xIn: 0.5, yIn: 6.5 }
+        ]
+      },
+      '20oz': {
+        label: '20oz Tumbler',
+        shapes: [
+          { id: 'r1', type: 'rect', wIn: 10.125, hIn: 5.25, xIn: 0.5, yIn: 0.5 }
+        ]
+      },
+      'square': {
+        label: '4" Square Coaster',
+        shapes: [
+          { id: 'r1', type: 'rect', wIn: 4.0, hIn: 4.0, xIn: 0.5, yIn: 0.5 }
+        ]
+      },
+      'round': {
+        label: '4" Round Coaster',
+        shapes: [
+          { id: 'r1', type: 'circle', rIn: 2.0, cxIn: 2.5, cyIn: 2.5 }
+        ]
       }
-    }
+    };
 
-    const widthPx  = Math.ceil(maxX * PPI);
-    const heightPx = Math.ceil(maxY * PPI);
-    svg.setAttribute('viewBox', '0 0 ' + widthPx + ' ' + heightPx);
-    svg.style.width  = Math.min(widthPx, 1200) + 'px';
-    svg.style.height = heightPx + 'px';
+    let activeShapes = TEMPLATES['40oz'].shapes;
 
-    const pad      = paddingIn * PPI;
-    const viewport = svg.querySelector('#viewport');
+    // ─── Canvas Sizing & Shape Drawing ──────────────────────────────────────
+    function drawTemplate(key) {
+      svg.querySelectorAll('[data-template-shape]').forEach(el => el.remove());
+      activeShapes = TEMPLATES[key].shapes;
 
-    for (const s of activeShapes) {
-      const group = document.createElementNS(svgNS, 'g');
-      group.setAttribute('data-template-shape', s.id);
-
-      if (s.type === 'rect') {
-        const x = s.xIn * PPI, y = s.yIn * PPI;
-        const w = s.wIn * PPI, h = s.hIn * PPI;
-
-        const outer = document.createElementNS(svgNS, 'rect');
-        outer.setAttribute('x', x);
-        outer.setAttribute('y', y);
-        outer.setAttribute('width', w);
-        outer.setAttribute('height', h);
-        outer.setAttribute('fill', 'none');
-        outer.setAttribute('stroke', '#000');
-        outer.setAttribute('stroke-width', 1);
-        outer.setAttribute('data-target', s.id);
-
-        const inner = document.createElementNS(svgNS, 'rect');
-        inner.setAttribute('x', x + pad);
-        inner.setAttribute('y', y + pad);
-        inner.setAttribute('width',  Math.max(0, w - pad * 2));
-        inner.setAttribute('height', Math.max(0, h - pad * 2));
-        inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
-
-        group.appendChild(outer);
-        group.appendChild(inner);
-
-      } else if (s.type === 'circle') {
-        const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
-
-        const outer = document.createElementNS(svgNS, 'circle');
-        outer.setAttribute('cx', cx);
-        outer.setAttribute('cy', cy);
-        outer.setAttribute('r', r);
-        outer.setAttribute('fill', 'none');
-        outer.setAttribute('stroke', '#000');
-        outer.setAttribute('stroke-width', 1);
-
-        const inner = document.createElementNS(svgNS, 'circle');
-        inner.setAttribute('cx', cx);
-        inner.setAttribute('cy', cy);
-        inner.setAttribute('r', Math.max(0, r - pad));
-        inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
-
-        group.appendChild(outer);
-        group.appendChild(inner);
-      }
-
-      svg.insertBefore(group, viewport);
-    }
-
-    showWarning(false);
-  }
-
-  // ─── Fit Transform ─────────────────────────────────────────────────────────
-  function computeFitTransform(imgW, imgH, boxX, boxY, boxW, boxH, mode) {
-    const pad = paddingIn * PPI;
-    const cw = boxW - pad * 2, ch = boxH - pad * 2;
-    const sx = cw / imgW, sy = ch / imgH;
-    const scale = (mode === 'cover') ? Math.max(sx, sy) : Math.min(sx, sy);
-    const sw = imgW * scale, sh = imgH * scale;
-    const tx = boxX + pad + (cw - sw) / 2;
-    const ty = boxY + pad + (ch - sh) / 2;
-    return { tx, ty, scale };
-  }
-
-  // ─── Insert SVG into a target shape ───────────────────────────────────────
-  function insertSVGString(svgText, targetShapeIndex) {
-    const parser = new DOMParser();
-    const doc    = parser.parseFromString(svgText, 'image/svg+xml');
-    const srcSvg = doc.documentElement;
-    let iw = 0, ih = 0;
-
-    const vb = srcSvg.getAttribute('viewBox');
-    if (vb) {
-      const parts = vb.trim().split(/\s+|,/).map(Number);
-      iw = parts[2]; ih = parts[3];
-    } else {
-      iw = parseFloat(srcSvg.getAttribute('width')  || 0);
-      ih = parseFloat(srcSvg.getAttribute('height') || 0);
-    }
-    if (!iw || !ih) { iw = 100; ih = 100; }
-
-    const target = activeShapes[targetShapeIndex];
-    let boxX, boxY, boxW, boxH;
-
-    if (target.type === 'rect') {
-      boxX = target.xIn * PPI; boxY = target.yIn * PPI;
-      boxW = target.wIn * PPI; boxH = target.hIn * PPI;
-    } else if (target.type === 'circle') {
-      boxX = (target.cxIn - target.rIn) * PPI;
-      boxY = (target.cyIn - target.rIn) * PPI;
-      boxW = target.rIn * 2 * PPI;
-      boxH = target.rIn * 2 * PPI;
-    }
-
-    const fit  = computeFitTransform(iw, ih, boxX, boxY, boxW, boxH, fitMode);
-    const img  = document.createElementNS(svgNS, 'image');
-    const blob = new Blob([svgText], { type: 'image/svg+xml' });
-    const url  = URL.createObjectURL(blob);
-
-    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
-    img.setAttribute('x', fit.tx);
-    img.setAttribute('y', fit.ty);
-    img.setAttribute('width',  iw * fit.scale);
-    img.setAttribute('height', ih * fit.scale);
-    img.setAttribute('preserveAspectRatio', (fitMode === 'cover') ? 'xMidYMid slice' : 'xMidYMid meet');
-    img.dataset.targetRect = target.id;
-
-    svg.appendChild(img);
-    img.addEventListener('load', () => URL.revokeObjectURL(url));
-  }
-
-  // ─── Drag / Drop from file system ─────────────────────────────────────────
-  const wrap = document.getElementById('svgwrap');
-  wrap.addEventListener('dragover',  e => { e.preventDefault(); wrap.classList.add('dragover'); });
-  wrap.addEventListener('dragleave', () => wrap.classList.remove('dragover'));
-  wrap.addEventListener('drop', e => {
-    e.preventDefault();
-    wrap.classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if (!files || files.length === 0) return;
-
-    const pt = svg.createSVGPoint();
-    pt.x = e.clientX; pt.y = e.clientY;
-    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
-
-    const shapeIndex = activeShapes.findIndex(s => {
-      if (s.type === 'rect') {
-        const x = s.xIn * PPI, y = s.yIn * PPI;
-        return svgPt.x >= x && svgPt.x <= x + s.wIn * PPI &&
-               svgPt.y >= y && svgPt.y <= y + s.hIn * PPI;
-      } else if (s.type === 'circle') {
-        const dx = svgPt.x - s.cxIn * PPI;
-        const dy = svgPt.y - s.cyIn * PPI;
-        return Math.sqrt(dx * dx + dy * dy) <= s.rIn * PPI;
-      }
-      return false;
-    });
-    const targetIndex = shapeIndex >= 0 ? shapeIndex : 0;
-
-    for (const file of files) {
-      if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
-        const reader = new FileReader();
-        reader.onload = ev => {
-          insertSVGString(ev.target.result, targetIndex);
-          if (window.checkArtworkBounds) window.checkArtworkBounds();
-        };
-        reader.readAsText(file);
-      }
-    }
-  });
-
-  // ─── Out-of-Bounds Warning ─────────────────────────────────────────────────
-  function checkArtworkBounds() {
-    const items = document.querySelectorAll('.canvas-item');
-    if (items.length === 0) { showWarning(false); return; }
-
-    const svgRect = svg.getBoundingClientRect();
-    const vbParts = svg.getAttribute('viewBox').split(' ');
-    const svgW    = parseFloat(vbParts[2]);
-    const svgH    = parseFloat(vbParts[3]);
-    const scaleX  = svgW / svgRect.width;
-    const scaleY  = svgH / svgRect.height;
-
-    let anyOutside = false;
-
-    for (const item of items) {
-      const cr     = item.getBoundingClientRect();
-      const left   = (cr.left   - svgRect.left) * scaleX;
-      const top    = (cr.top    - svgRect.top)  * scaleY;
-      const right  = (cr.right  - svgRect.left) * scaleX;
-      const bottom = (cr.bottom - svgRect.top)  * scaleY;
-
-      let inside = false;
-
+      let maxX = 0, maxY = 0;
       for (const s of activeShapes) {
         if (s.type === 'rect') {
-          const sx = s.xIn * PPI, sy = s.yIn * PPI;
-          const sw = s.wIn * PPI, sh = s.hIn * PPI;
-          if (left >= sx && right <= sx + sw && top >= sy && bottom <= sy + sh) {
-            inside = true; break;
-          }
+          maxX = Math.max(maxX, s.xIn + s.wIn + 0.5);
+          maxY = Math.max(maxY, s.yIn + s.hIn + 0.5);
         } else if (s.type === 'circle') {
-          const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
-          const corners = [
-            { x: left,  y: top    },
-            { x: right, y: top    },
-            { x: left,  y: bottom },
-            { x: right, y: bottom }
-          ];
-          if (corners.every(p => Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2) <= r)) {
-            inside = true; break;
-          }
+          maxX = Math.max(maxX, s.cxIn + s.rIn + 0.5);
+          maxY = Math.max(maxY, s.cyIn + s.rIn + 0.5);
         }
       }
 
-      if (!inside) { anyOutside = true; break; }
-    }
+      const widthPx  = Math.ceil(maxX * PPI);
+      const heightPx = Math.ceil(maxY * PPI);
+      svg.setAttribute('viewBox', '0 0 ' + widthPx + ' ' + heightPx);
+      svg.style.width  = Math.min(widthPx, 1200) + 'px';
+      svg.style.height = heightPx + 'px';
 
-    showWarning(anyOutside);
-  }
+      const pad      = paddingIn * PPI;
+      const viewport = svg.querySelector('#viewport');
 
-  // ─── Warning Banner ────────────────────────────────────────────────────────
-  function showWarning(show) {
-    let banner = document.getElementById('boundsWarning');
-    if (show && !banner) {
-      banner = document.createElement('div');
-      banner.id = 'boundsWarning';
-      banner.textContent = '\u26a0\ufe0f Some artwork is outside the engraving area.';
-      banner.style.cssText = [
-        'position:fixed',
-        'bottom:16px',
-        'left:50%',
-        'transform:translateX(-50%)',
-        'background:#fff3cd',
-        'color:#856404',
-        'border:1px solid #ffc107',
-        'padding:10px 20px',
-        'border-radius:8px',
-        'font-weight:bold',
-        'box-shadow:0 2px 8px rgba(0,0,0,0.15)',
-        'z-index:9999'
-      ].join(';');
-      document.body.appendChild(banner);
-    } else if (!show && banner) {
-      banner.remove();
-    }
-  }
+      for (const s of activeShapes) {
+        const group = document.createElementNS(svgNS, 'g');
+        group.setAttribute('data-template-shape', s.id);
 
-  // ─── Template Switcher ─────────────────────────────────────────────────────
-  document.getElementById('templateSelect').addEventListener('change', e => {
-    drawTemplate(e.target.value);
-  });
+        if (s.type === 'rect') {
+          const x = s.xIn * PPI, y = s.yIn * PPI;
+          const w = s.wIn * PPI, h = s.hIn * PPI;
 
-  // ─── Font Loader ───────────────────────────────────────────────────────────
-  async function loadFonts() {
-    try {
-      const response = await fetch('/js/fonts.json');
-      const folders  = await response.json();
+          const outer = document.createElementNS(svgNS, 'rect');
+          outer.setAttribute('x', x);
+          outer.setAttribute('y', y);
+          outer.setAttribute('width', w);
+          outer.setAttribute('height', h);
+          outer.setAttribute('fill', 'none');
+          outer.setAttribute('stroke', '#000');
+          outer.setAttribute('stroke-width', 1);
+          outer.setAttribute('data-target', s.id);
 
-      const css = folders.flatMap(folder => folder.children || []).map(font => `
-        @font-face {
-          font-family: '${font.name}';
-          src: url('${font.file}') format('woff2');
-          font-weight: normal;
-          font-style: normal;
+          const inner = document.createElementNS(svgNS, 'rect');
+          inner.setAttribute('x', x + pad);
+          inner.setAttribute('y', y + pad);
+          inner.setAttribute('width',  Math.max(0, w - pad * 2));
+          inner.setAttribute('height', Math.max(0, h - pad * 2));
+          inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
+
+          group.appendChild(outer);
+          group.appendChild(inner);
+
+        } else if (s.type === 'circle') {
+          const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
+
+          const outer = document.createElementNS(svgNS, 'circle');
+          outer.setAttribute('cx', cx);
+          outer.setAttribute('cy', cy);
+          outer.setAttribute('r', r);
+          outer.setAttribute('fill', 'none');
+          outer.setAttribute('stroke', '#000');
+          outer.setAttribute('stroke-width', 1);
+
+          const inner = document.createElementNS(svgNS, 'circle');
+          inner.setAttribute('cx', cx);
+          inner.setAttribute('cy', cy);
+          inner.setAttribute('r', Math.max(0, r - pad));
+          inner.setAttribute('fill', 'rgba(0,0,0,0.02)');
+
+          group.appendChild(outer);
+          group.appendChild(inner);
         }
-      `).join('\n');
 
-      // Inject into document head for live preview rendering
-      const docStyle = document.createElement('style');
-      docStyle.textContent = css;
-      document.head.appendChild(docStyle);
+        svg.insertBefore(group, viewport);
+      }
 
-      // Inject into SVG <defs> so fonts travel with exported SVG
-      const svgStyle = document.getElementById('font-face-styles');
-      if (svgStyle) svgStyle.textContent = css;
-
-      return folders;
-    } catch (err) {
-      console.warn('fonts.json could not be loaded:', err);
-      return [];
+      showWarning(false);
     }
-  }
 
-  // ─── Font Picker Builder ───────────────────────────────────────────────────
-  function buildFontPicker(folders) {
-    const container = document.getElementById('font-folder-list');
-    container.innerHTML = '';
+    // ─── Fit Transform ───────────────────────────────────────────────────────
+    function computeFitTransform(imgW, imgH, boxX, boxY, boxW, boxH, mode) {
+      const pad = paddingIn * PPI;
+      const cw = boxW - pad * 2, ch = boxH - pad * 2;
+      const sx = cw / imgW, sy = ch / imgH;
+      const scale = (mode === 'cover') ? Math.max(sx, sy) : Math.min(sx, sy);
+      const sw = imgW * scale, sh = imgH * scale;
+      const tx = boxX + pad + (cw - sw) / 2;
+      const ty = boxY + pad + (ch - sh) / 2;
+      return { tx, ty, scale };
+    }
 
-    folders.forEach(folder => {
-      const header = document.createElement('div');
-      header.className = 'font-folder-header';
-      header.innerHTML = `<span>${folder.name}</span><span class="arrow">▶</span>`;
+    // ─── Insert SVG into a target shape ─────────────────────────────────────
+    function insertSVGString(svgText, targetShapeIndex) {
+      const parser = new DOMParser();
+      const doc    = parser.parseFromString(svgText, 'image/svg+xml');
+      const srcSvg = doc.documentElement;
+      let iw = 0, ih = 0;
 
-      const list = document.createElement('div');
-      list.className = 'font-folder-list';
+      const vb = srcSvg.getAttribute('viewBox');
+      if (vb) {
+        const parts = vb.trim().split(/\s+|,/).map(Number);
+        iw = parts[2]; ih = parts[3];
+      } else {
+        iw = parseFloat(srcSvg.getAttribute('width')  || 0);
+        ih = parseFloat(srcSvg.getAttribute('height') || 0);
+      }
+      if (!iw || !ih) { iw = 100; ih = 100; }
 
-      (folder.children || []).forEach(font => {
-        const item = document.createElement('div');
-        item.className  = 'font-item';
-        item.textContent = font.name;
-        item.style.fontFamily = `'${font.name}', sans-serif`;
-        item.addEventListener('click', () => {
-        if (window.applyFontToSelected) window.applyFontToSelected(font.name);
-        document.getElementById('font-panel').style.display = 'none';
+      const target = activeShapes[targetShapeIndex];
+      let boxX, boxY, boxW, boxH;
+
+      if (target.type === 'rect') {
+        boxX = target.xIn * PPI; boxY = target.yIn * PPI;
+        boxW = target.wIn * PPI; boxH = target.hIn * PPI;
+      } else if (target.type === 'circle') {
+        boxX = (target.cxIn - target.rIn) * PPI;
+        boxY = (target.cyIn - target.rIn) * PPI;
+        boxW = target.rIn * 2 * PPI;
+        boxH = target.rIn * 2 * PPI;
+      }
+
+      const fit  = computeFitTransform(iw, ih, boxX, boxY, boxW, boxH, fitMode);
+      const img  = document.createElementNS(svgNS, 'image');
+      const blob = new Blob([svgText], { type: 'image/svg+xml' });
+      const url  = URL.createObjectURL(blob);
+
+      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+      img.setAttribute('x', fit.tx);
+      img.setAttribute('y', fit.ty);
+      img.setAttribute('width',  iw * fit.scale);
+      img.setAttribute('height', ih * fit.scale);
+      img.setAttribute('preserveAspectRatio', (fitMode === 'cover') ? 'xMidYMid slice' : 'xMidYMid meet');
+      img.dataset.targetRect = target.id;
+
+      svg.appendChild(img);
+      img.addEventListener('load', () => URL.revokeObjectURL(url));
+    }
+
+    // ─── Drag / Drop from file system ───────────────────────────────────────
+    const wrap = document.getElementById('svgwrap');
+    wrap.addEventListener('dragover',  e => { e.preventDefault(); wrap.classList.add('dragover'); });
+    wrap.addEventListener('dragleave', () => wrap.classList.remove('dragover'));
+    wrap.addEventListener('drop', e => {
+      e.preventDefault();
+      wrap.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (!files || files.length === 0) return;
+
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+      const shapeIndex = activeShapes.findIndex(s => {
+        if (s.type === 'rect') {
+          const x = s.xIn * PPI, y = s.yIn * PPI;
+          return svgPt.x >= x && svgPt.x <= x + s.wIn * PPI &&
+                 svgPt.y >= y && svgPt.y <= y + s.hIn * PPI;
+        } else if (s.type === 'circle') {
+          const dx = svgPt.x - s.cxIn * PPI;
+          const dy = svgPt.y - s.cyIn * PPI;
+          return Math.sqrt(dx * dx + dy * dy) <= s.rIn * PPI;
+        }
+        return false;
+      });
+      const targetIndex = shapeIndex >= 0 ? shapeIndex : 0;
+
+      for (const file of files) {
+        if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            insertSVGString(ev.target.result, targetIndex);
+            if (window.checkArtworkBounds) window.checkArtworkBounds();
+          };
+          reader.readAsText(file);
+        }
+      }
+    });
+
+    // ─── Out-of-Bounds Warning ───────────────────────────────────────────────
+    function checkArtworkBounds() {
+      const items = document.querySelectorAll('.canvas-item');
+      if (items.length === 0) { showWarning(false); return; }
+
+      const svgRect = svg.getBoundingClientRect();
+      const vbParts = svg.getAttribute('viewBox').split(' ');
+      const svgW    = parseFloat(vbParts[2]);
+      const svgH    = parseFloat(vbParts[3]);
+      const scaleX  = svgW / svgRect.width;
+      const scaleY  = svgH / svgRect.height;
+
+      let anyOutside = false;
+
+      for (const item of items) {
+        const cr     = item.getBoundingClientRect();
+        const left   = (cr.left   - svgRect.left) * scaleX;
+        const top    = (cr.top    - svgRect.top)  * scaleY;
+        const right  = (cr.right  - svgRect.left) * scaleX;
+        const bottom = (cr.bottom - svgRect.top)  * scaleY;
+
+        let inside = false;
+
+        for (const s of activeShapes) {
+          if (s.type === 'rect') {
+            const sx = s.xIn * PPI, sy = s.yIn * PPI;
+            const sw = s.wIn * PPI, sh = s.hIn * PPI;
+            if (left >= sx && right <= sx + sw && top >= sy && bottom <= sy + sh) {
+              inside = true; break;
+            }
+          } else if (s.type === 'circle') {
+            const cx = s.cxIn * PPI, cy = s.cyIn * PPI, r = s.rIn * PPI;
+            const corners = [
+              { x: left,  y: top    },
+              { x: right, y: top    },
+              { x: left,  y: bottom },
+              { x: right, y: bottom }
+            ];
+            if (corners.every(p => Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2) <= r)) {
+              inside = true; break;
+            }
+          }
+        }
+
+        if (!inside) { anyOutside = true; break; }
+      }
+
+      showWarning(anyOutside);
+    }
+
+    // ─── Warning Banner ──────────────────────────────────────────────────────
+    function showWarning(show) {
+      let banner = document.getElementById('boundsWarning');
+      if (show && !banner) {
+        banner = document.createElement('div');
+        banner.id = 'boundsWarning';
+        banner.textContent = '\u26a0\ufe0f Some artwork is outside the engraving area.';
+        banner.style.cssText = [
+          'position:fixed',
+          'bottom:16px',
+          'left:50%',
+          'transform:translateX(-50%)',
+          'background:#fff3cd',
+          'color:#856404',
+          'border:1px solid #ffc107',
+          'padding:10px 20px',
+          'border-radius:8px',
+          'font-weight:bold',
+          'box-shadow:0 2px 8px rgba(0,0,0,0.15)',
+          'z-index:9999'
+        ].join(';');
+        document.body.appendChild(banner);
+      } else if (!show && banner) {
+        banner.remove();
+      }
+    }
+
+    // ─── Template Switcher ───────────────────────────────────────────────────
+    document.getElementById('templateSelect').addEventListener('change', e => {
+      drawTemplate(e.target.value);
+    });
+
+    // ─── Font Loader ─────────────────────────────────────────────────────────
+    async function loadFonts() {
+      try {
+        const response = await fetch('/js/fonts.json');
+        const folders  = await response.json();
+
+        const css = folders.flatMap(folder => folder.children || []).map(font => `
+          @font-face {
+            font-family: '${font.name}';
+            src: url('${font.file}') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+          }
+        `).join('\n');
+
+        const docStyle = document.createElement('style');
+        docStyle.textContent = css;
+        document.head.appendChild(docStyle);
+
+        const svgStyle = document.getElementById('font-face-styles');
+        if (svgStyle) svgStyle.textContent = css;
+
+        return folders;
+      } catch (err) {
+        console.warn('fonts.json could not be loaded:', err);
+        return [];
+      }
+    }
+
+    // ─── Font Picker Builder ─────────────────────────────────────────────────
+    function buildFontPicker(folders) {
+      const container = document.getElementById('font-folder-list');
+      container.innerHTML = '';
+
+      folders.forEach(folder => {
+        const header = document.createElement('div');
+        header.className = 'font-folder-header';
+        header.innerHTML = `<span>${folder.name}</span><span class="arrow">▶</span>`;
+
+        const list = document.createElement('div');
+        list.className = 'font-folder-list';
+
+        (folder.children || []).forEach(font => {
+          const item = document.createElement('div');
+          item.className   = 'font-item';
+          item.textContent = font.name;
+          item.style.fontFamily = `'${font.name}', sans-serif`;
+          item.addEventListener('click', () => {
+            if (window.applyFontToSelected) window.applyFontToSelected(font.name);
+            document.getElementById('font-panel').style.display = 'none';
+          });
+          list.appendChild(item);
         });
 
-        list.appendChild(item);
-      });
+        header.addEventListener('click', () => {
+          const open = list.style.display === 'block';
+          list.style.display = open ? 'none' : 'block';
+          header.querySelector('.arrow').textContent = open ? '▶' : '▼';
+        });
 
-      header.addEventListener('click', () => {
-        const open = list.style.display === 'block';
-        list.style.display = open ? 'none' : 'block';
-        header.querySelector('.arrow').textContent = open ? '▶' : '▼';
+        container.appendChild(header);
+        container.appendChild(list);
       });
+    }
 
-      container.appendChild(header);
-      container.appendChild(list);
+    // ─── Font Panel Close ────────────────────────────────────────────────────
+    document.getElementById('font-panel-close').addEventListener('click', () => {
+      document.getElementById('font-panel').style.display = 'none';
     });
-  }
 
-  // ─── Font Panel Close Button ───────────────────────────────────────────────
-  document.getElementById('font-panel-close').addEventListener('click', () => {
-    document.getElementById('font-panel').style.display = 'none';
+    // ─── Expose to app.js ────────────────────────────────────────────────────
+    window.checkArtworkBounds = checkArtworkBounds;
+
+    // ─── Init ────────────────────────────────────────────────────────────────
+    drawTemplate('40oz');
+    loadFonts().then(folders => buildFontPicker(folders));
   });
+  </script>
 
-  // ─── Apply Font to Selected Text Element ──────────────────────────────────
-  //function applyFontToSelected(fontName) {
-    //const el = window._selectedTextEl;
-    //if (!el) return;
-    //const textEl = el.querySelector('text');
-    //if (!textEl) return;
-    //textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
-    //el.dataset.fontFamily = fontName;
-    //const fontBtn = document.getElementById('tb-font-btn');
-    //if (fontBtn) {
-      //fontBtn.textContent = fontName;
-      //fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
-    //}
-  //}
-
-  // ─── Get Snap Target (first rect shape, or canvas centre fallback) ─────────
-  function getSnapTarget() {
-    const s = activeShapes[0];
-    if (!s) return null;
-    if (s.type === 'rect') {
-      return { x: s.xIn * PPI, y: s.yIn * PPI, w: s.wIn * PPI, h: s.hIn * PPI };
-    } else if (s.type === 'circle') {
-      const r = s.rIn * PPI;
-      return { x: (s.cxIn - s.rIn) * PPI, y: (s.cyIn - s.rIn) * PPI, w: r * 2, h: r * 2 };
-    }
-    return null;
-  }
-
-  // ─── Add Text Element ──────────────────────────────────────────────────────
-  function addTextElement() {
-    const target = getSnapTarget();
-    const defaultFont = 'Blackcraft';
-    const fontSize    = 36;
-
-    const x = target ? target.x : 100;
-    const y = target ? target.y : 100;
-    const w = target ? target.w : 200;
-    const h = target ? target.h : 60;
-
-    const g = document.createElementNS(svgNS, 'g');
-    g.classList.add('canvas-item', 'text-item');
-    g.dataset.fontFamily = defaultFont;
-    g.dataset.fontSize   = fontSize;
-
-    const nested = document.createElementNS(svgNS, 'svg');
-    nested.setAttribute('x',        x);
-    nested.setAttribute('y',        y);
-    nested.setAttribute('width',    w);
-    nested.setAttribute('height',   h);
-    nested.setAttribute('overflow', 'visible');
-
-    const textEl = document.createElementNS(svgNS, 'text');
-    textEl.setAttribute('x',                '50%');
-    textEl.setAttribute('y',                '50%');
-    textEl.setAttribute('dominant-baseline', 'middle');
-    textEl.setAttribute('text-anchor',       'middle');
-    textEl.setAttribute('fill',              '#000000');
-    textEl.setAttribute('font-family',       `'${defaultFont}', sans-serif`);
-    textEl.setAttribute('font-size',         fontSize);
-    textEl.textContent = 'Your Text Here';
-
-    nested.appendChild(textEl);
-    g.appendChild(nested);
-    svg.querySelector('#viewport').appendChild(g);
-
-    selectTextItem(g);
-  }
-
-  // ─── Select Text Item & Show Toolbar ──────────────────────────────────────
-  function selectTextItem(el) {
-    window._selectedTextEl = el;
-    const toolbar   = document.getElementById('text-toolbar');
-    const fontBtn   = document.getElementById('tb-font-btn');
-    const sizeLabel = document.getElementById('tb-size-label');
-
-    fontBtn.textContent      = el.dataset.fontFamily || 'Font';
-    fontBtn.style.fontFamily = `'${el.dataset.fontFamily}', sans-serif`;
-    sizeLabel.textContent    = (el.dataset.fontSize || 36) + 'px';
-    toolbar.style.display    = 'flex';
-  }
-
-  // ─── Text Toolbar Buttons ──────────────────────────────────────────────────
-  document.getElementById('tb-font-btn').addEventListener('click', () => {
-    const panel = document.getElementById('font-panel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  });
-
-  document.getElementById('tb-size-down').addEventListener('click', () => {
-    const el = window._selectedTextEl;
-    if (!el) return;
-    const textEl = el.querySelector('text');
-    const size   = Math.max(6, parseFloat(el.dataset.fontSize) - 2);
-    el.dataset.fontSize = size;
-    textEl.setAttribute('font-size', size);
-    document.getElementById('tb-size-label').textContent = size + 'px';
-  });
-
-  document.getElementById('tb-size-up').addEventListener('click', () => {
-    const el = window._selectedTextEl;
-    if (!el) return;
-    const textEl = el.querySelector('text');
-    const size   = Math.min(300, parseFloat(el.dataset.fontSize) + 2);
-    el.dataset.fontSize = size;
-    textEl.setAttribute('font-size', size);
-    document.getElementById('tb-size-label').textContent = size + 'px';
-  });
-
-  document.getElementById('tb-edit-btn').addEventListener('click', () => {
-    const el = window._selectedTextEl;
-    if (!el) return;
-    const textEl  = el.querySelector('text');
-    const newText = window.prompt('Edit text:', textEl.textContent);
-    if (newText !== null) textEl.textContent = newText;
-  });
-
-  document.getElementById('tb-delete-btn').addEventListener('click', () => {
-    const el = window._selectedTextEl;
-    if (!el) return;
-    el.remove();
-    window._selectedTextEl = null;
-    document.getElementById('text-toolbar').style.display = 'none';
-  });
-
-  // ─── Add Text Button ──────────────────────────────────────────────────────
-  document.getElementById('addTextBtn').addEventListener('click', addTextElement);
-
-  // ─── Hide text toolbar when clicking canvas background ────────────────────
-  svg.addEventListener('click', e => {
-    if (e.target === svg || e.target.id === 'viewport') {
-      document.getElementById('text-toolbar').style.display = 'none';
-      window._selectedTextEl = null;
-    }
-  });
-
-  // ─── Expose bounds check to app.js ────────────────────────────────────────
-  window.checkArtworkBounds = checkArtworkBounds;
-
-  // ─── Init ──────────────────────────────────────────────────────────────────
-  drawTemplate('40oz');
-  loadFonts().then(folders => buildFontPicker(folders));
-
-});
-</script>
-
-<script type="module" src="./js/app.js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
