@@ -13,6 +13,103 @@
     .workspace { flex:1; }
     #svgwrap { display:block; border:1px solid #ccc; border-radius:12px; padding:8px; background:#fff; }
     #svgwrap.dragover { outline:3px dashed #08f; }
+
+    /* ── Font Panel ── */
+    #font-panel {
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      width: 240px;
+      max-height: 70vh;
+      overflow-y: auto;
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 10px;
+      z-index: 2000;
+      padding: 8px 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    #font-panel .panel-header {
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 6px 14px 10px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #font-panel .panel-header button {
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .font-folder-header {
+      color: #ccc;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 14px 4px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+    }
+    .font-folder-header:hover { color: #fff; }
+    .font-folder-list { display: none; }
+    .font-item {
+      padding: 6px 20px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 20px;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .font-item:hover { background: #333; }
+
+    /* ── Text Toolbar ── */
+    #text-toolbar {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 8px 16px;
+      gap: 10px;
+      align-items: center;
+      z-index: 1000;
+      color: #fff;
+      font-size: 14px;
+    }
+    #text-toolbar button {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 5px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #text-toolbar button:hover { background: #444; }
+    #text-toolbar #tb-font-btn {
+      font-size: 16px;
+      min-width: 120px;
+      text-align: left;
+    }
+    #text-toolbar #tb-size-label {
+      min-width: 40px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -27,7 +124,14 @@
       <option value="square">4" Square Coaster</option>
       <option value="round">4" Round Coaster</option>
     </select>
-    <button id="deleteBtn" style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Remove Selected</button>
+    <button id="addTextBtn" title="Add Text Element"
+      style="background:#0d6efd; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:15px;">
+      T
+    </button>
+    <button id="deleteBtn"
+      style="background:#dc3545; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">
+      Remove Selected
+    </button>
     <button id="exportBtn">Upload Design</button>
   </header>
 
@@ -44,12 +148,31 @@
              width="100%"
              height="600"
              style="background:#fff; border-radius:12px; display:block;">
-          <!-- Template shapes are inserted before this group, artwork goes inside it -->
+          <defs><style id="font-face-styles"></style></defs>
           <g id="viewport"></g>
         </svg>
       </div>
     </section>
   </main>
+
+  <!-- Font Picker Panel -->
+  <div id="font-panel">
+    <div class="panel-header">
+      <span>Choose Font</span>
+      <button id="font-panel-close" title="Close">✕</button>
+    </div>
+    <div id="font-folder-list"></div>
+  </div>
+
+  <!-- Text Toolbar -->
+  <div id="text-toolbar">
+    <button id="tb-font-btn" title="Change font">Font</button>
+    <button id="tb-size-down" title="Decrease size">A−</button>
+    <span id="tb-size-label">36px</span>
+    <button id="tb-size-up" title="Increase size">A+</button>
+    <button id="tb-edit-btn" title="Edit text">✏️ Edit</button>
+    <button id="tb-delete-btn" title="Remove text">🗑️</button>
+  </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -351,11 +474,218 @@ document.addEventListener('DOMContentLoaded', function () {
     drawTemplate(e.target.value);
   });
 
+  // ─── Font Loader ───────────────────────────────────────────────────────────
+  async function loadFonts() {
+    try {
+      const response = await fetch('/js/fonts.json');
+      const folders  = await response.json();
+
+      const css = folders.flatMap(folder => folder.children || []).map(font => `
+        @font-face {
+          font-family: '${font.name}';
+          src: url('${font.file}') format('woff2');
+          font-weight: normal;
+          font-style: normal;
+        }
+      `).join('\n');
+
+      // Inject into document head for live preview rendering
+      const docStyle = document.createElement('style');
+      docStyle.textContent = css;
+      document.head.appendChild(docStyle);
+
+      // Inject into SVG <defs> so fonts travel with exported SVG
+      const svgStyle = document.getElementById('font-face-styles');
+      if (svgStyle) svgStyle.textContent = css;
+
+      return folders;
+    } catch (err) {
+      console.warn('fonts.json could not be loaded:', err);
+      return [];
+    }
+  }
+
+  // ─── Font Picker Builder ───────────────────────────────────────────────────
+  function buildFontPicker(folders) {
+    const container = document.getElementById('font-folder-list');
+    container.innerHTML = '';
+
+    folders.forEach(folder => {
+      const header = document.createElement('div');
+      header.className = 'font-folder-header';
+      header.innerHTML = `<span>${folder.name}</span><span class="arrow">▶</span>`;
+
+      const list = document.createElement('div');
+      list.className = 'font-folder-list';
+
+      (folder.children || []).forEach(font => {
+        const item = document.createElement('div');
+        item.className  = 'font-item';
+        item.textContent = font.name;
+        item.style.fontFamily = `'${font.name}', sans-serif`;
+        item.addEventListener('click', () => {
+          applyFontToSelected(font.name);
+          document.getElementById('font-panel').style.display = 'none';
+        });
+        list.appendChild(item);
+      });
+
+      header.addEventListener('click', () => {
+        const open = list.style.display === 'block';
+        list.style.display = open ? 'none' : 'block';
+        header.querySelector('.arrow').textContent = open ? '▶' : '▼';
+      });
+
+      container.appendChild(header);
+      container.appendChild(list);
+    });
+  }
+
+  // ─── Font Panel Close Button ───────────────────────────────────────────────
+  document.getElementById('font-panel-close').addEventListener('click', () => {
+    document.getElementById('font-panel').style.display = 'none';
+  });
+
+  // ─── Apply Font to Selected Text Element ──────────────────────────────────
+  function applyFontToSelected(fontName) {
+    const el = window._selectedTextEl;
+    if (!el) return;
+    const textEl = el.querySelector('text');
+    if (!textEl) return;
+    textEl.setAttribute('font-family', `'${fontName}', sans-serif`);
+    el.dataset.fontFamily = fontName;
+    const fontBtn = document.getElementById('tb-font-btn');
+    if (fontBtn) {
+      fontBtn.textContent = fontName;
+      fontBtn.style.fontFamily = `'${fontName}', sans-serif`;
+    }
+  }
+
+  // ─── Get Snap Target (first rect shape, or canvas centre fallback) ─────────
+  function getSnapTarget() {
+    const s = activeShapes[0];
+    if (!s) return null;
+    if (s.type === 'rect') {
+      return { x: s.xIn * PPI, y: s.yIn * PPI, w: s.wIn * PPI, h: s.hIn * PPI };
+    } else if (s.type === 'circle') {
+      const r = s.rIn * PPI;
+      return { x: (s.cxIn - s.rIn) * PPI, y: (s.cyIn - s.rIn) * PPI, w: r * 2, h: r * 2 };
+    }
+    return null;
+  }
+
+  // ─── Add Text Element ──────────────────────────────────────────────────────
+  function addTextElement() {
+    const target = getSnapTarget();
+    const defaultFont = 'Blackcraft';
+    const fontSize    = 36;
+
+    const x = target ? target.x : 100;
+    const y = target ? target.y : 100;
+    const w = target ? target.w : 200;
+    const h = target ? target.h : 60;
+
+    const g = document.createElementNS(svgNS, 'g');
+    g.classList.add('canvas-item', 'text-item');
+    g.dataset.fontFamily = defaultFont;
+    g.dataset.fontSize   = fontSize;
+
+    const nested = document.createElementNS(svgNS, 'svg');
+    nested.setAttribute('x',        x);
+    nested.setAttribute('y',        y);
+    nested.setAttribute('width',    w);
+    nested.setAttribute('height',   h);
+    nested.setAttribute('overflow', 'visible');
+
+    const textEl = document.createElementNS(svgNS, 'text');
+    textEl.setAttribute('x',                '50%');
+    textEl.setAttribute('y',                '50%');
+    textEl.setAttribute('dominant-baseline', 'middle');
+    textEl.setAttribute('text-anchor',       'middle');
+    textEl.setAttribute('fill',              '#000000');
+    textEl.setAttribute('font-family',       `'${defaultFont}', sans-serif`);
+    textEl.setAttribute('font-size',         fontSize);
+    textEl.textContent = 'Your Text Here';
+
+    nested.appendChild(textEl);
+    g.appendChild(nested);
+    svg.querySelector('#viewport').appendChild(g);
+
+    selectTextItem(g);
+  }
+
+  // ─── Select Text Item & Show Toolbar ──────────────────────────────────────
+  function selectTextItem(el) {
+    window._selectedTextEl = el;
+    const toolbar   = document.getElementById('text-toolbar');
+    const fontBtn   = document.getElementById('tb-font-btn');
+    const sizeLabel = document.getElementById('tb-size-label');
+
+    fontBtn.textContent      = el.dataset.fontFamily || 'Font';
+    fontBtn.style.fontFamily = `'${el.dataset.fontFamily}', sans-serif`;
+    sizeLabel.textContent    = (el.dataset.fontSize || 36) + 'px';
+    toolbar.style.display    = 'flex';
+  }
+
+  // ─── Text Toolbar Buttons ──────────────────────────────────────────────────
+  document.getElementById('tb-font-btn').addEventListener('click', () => {
+    const panel = document.getElementById('font-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('tb-size-down').addEventListener('click', () => {
+    const el = window._selectedTextEl;
+    if (!el) return;
+    const textEl = el.querySelector('text');
+    const size   = Math.max(6, parseFloat(el.dataset.fontSize) - 2);
+    el.dataset.fontSize = size;
+    textEl.setAttribute('font-size', size);
+    document.getElementById('tb-size-label').textContent = size + 'px';
+  });
+
+  document.getElementById('tb-size-up').addEventListener('click', () => {
+    const el = window._selectedTextEl;
+    if (!el) return;
+    const textEl = el.querySelector('text');
+    const size   = Math.min(300, parseFloat(el.dataset.fontSize) + 2);
+    el.dataset.fontSize = size;
+    textEl.setAttribute('font-size', size);
+    document.getElementById('tb-size-label').textContent = size + 'px';
+  });
+
+  document.getElementById('tb-edit-btn').addEventListener('click', () => {
+    const el = window._selectedTextEl;
+    if (!el) return;
+    const textEl  = el.querySelector('text');
+    const newText = window.prompt('Edit text:', textEl.textContent);
+    if (newText !== null) textEl.textContent = newText;
+  });
+
+  document.getElementById('tb-delete-btn').addEventListener('click', () => {
+    const el = window._selectedTextEl;
+    if (!el) return;
+    el.remove();
+    window._selectedTextEl = null;
+    document.getElementById('text-toolbar').style.display = 'none';
+  });
+
+  // ─── Add Text Button ──────────────────────────────────────────────────────
+  document.getElementById('addTextBtn').addEventListener('click', addTextElement);
+
+  // ─── Hide text toolbar when clicking canvas background ────────────────────
+  svg.addEventListener('click', e => {
+    if (e.target === svg || e.target.id === 'viewport') {
+      document.getElementById('text-toolbar').style.display = 'none';
+      window._selectedTextEl = null;
+    }
+  });
+
   // ─── Expose bounds check to app.js ────────────────────────────────────────
   window.checkArtworkBounds = checkArtworkBounds;
 
   // ─── Init ──────────────────────────────────────────────────────────────────
   drawTemplate('40oz');
+  loadFonts().then(folders => buildFontPicker(folders));
 
 });
 </script>
