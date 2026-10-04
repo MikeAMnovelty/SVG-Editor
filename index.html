@@ -507,41 +507,46 @@
       }
     }
 
-    // ─── Font Picker Builder ─────────────────────────────────────────────────
-    function buildFontPicker(folders) {
-      const container = document.getElementById('font-folder-list');
-      container.innerHTML = '';
+   // ─── Font Picker Builder ─────────────────────────────────────────────────
+function buildFontPicker(folders) {
+  const container = document.getElementById('font-folder-list');
+  container.innerHTML = '';
 
-      folders.forEach(folder => {
-        const header = document.createElement('div');
-        header.className = 'font-folder-header';
-        header.innerHTML = `<span>${folder.name}</span><span class="arrow">▶</span>`;
+  folders.forEach(folder => {
+    const header = document.createElement('div');
+    header.className = 'font-folder-header';
+    header.innerHTML = `<span>${folder.name}</span><span class="arrow">▶</span>`;
 
-        const list = document.createElement('div');
-        list.className = 'font-folder-list';
+    const list = document.createElement('div');
+    list.className = 'font-folder-list';
 
-        (folder.children || []).forEach(font => {
-          const item = document.createElement('div');
-          item.className   = 'font-item';
-          item.textContent = font.name;
-          item.style.fontFamily = `'${font.name}', sans-serif`;
-          item.addEventListener('click', () => {
-            if (window.applyFontToSelected) window.applyFontToSelected(font.name);
-            document.getElementById('font-panel').style.display = 'none';
-          });
-          list.appendChild(item);
-        });
-
-        header.addEventListener('click', () => {
-          const open = list.style.display === 'block';
-          list.style.display = open ? 'none' : 'block';
-          header.querySelector('.arrow').textContent = open ? '▶' : '▼';
-        });
-
-        container.appendChild(header);
-        container.appendChild(list);
+    (folder.children || []).forEach(font => {
+      const item = document.createElement('div');
+      item.className        = 'font-item';
+      item.textContent      = font.name;
+      item.style.fontFamily = `'${font.name}', sans-serif`;
+      item.addEventListener('click', () => {
+        // Store the folder so export can find the exact font file
+        if (window.activeTextItem) {
+          window.activeTextItem.dataset.fontFolder = folder.name;
+        }
+        if (window.applyFontToSelected) window.applyFontToSelected(font.name);
+        document.getElementById('font-panel').style.display = 'none';
       });
-    }
+      list.appendChild(item);
+    });
+
+    header.addEventListener('click', () => {
+      const open = list.style.display === 'block';
+      list.style.display = open ? 'none' : 'block';
+      header.querySelector('.arrow').textContent = open ? '▶' : '▼';
+    });
+
+    container.appendChild(header);
+    container.appendChild(list);
+  });
+}
+
 
     // ─── Font Panel Close ────────────────────────────────────────────────────
     document.getElementById('font-panel-close').addEventListener('click', () => {

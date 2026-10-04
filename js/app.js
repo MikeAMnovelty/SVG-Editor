@@ -359,6 +359,7 @@ function addTextElement() {
   const g = document.createElementNS(svgNS, 'g');
   g.classList.add('canvas-item', 'text-item');
   g.dataset.fontFamily = defaultFont;
+  g.dataset.fontFolder = 'Regular 1';  // ← Blackcraft lives in Regular 1
   g.dataset.fontSize   = fontSize;
   g.dataset.x          = x;
   g.dataset.y          = y;
@@ -447,16 +448,13 @@ function deleteSelected() {
 let clipboardItem = null;
 
 document.addEventListener('keydown', e => {
-  // Delete / Backspace
   if ((e.key === 'Delete' || e.key === 'Backspace') && (activeItem || activeTextItem)) {
     e.preventDefault();
     deleteSelected();
   }
-  // Copy
   if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
     if (activeItem) clipboardItem = activeItem;
   }
-  // Paste
   if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
     if (clipboardItem) pasteItem(clipboardItem);
   }
@@ -629,80 +627,72 @@ function updateControlsPosition(el) {
 async function convertTextsToPaths() {
   const textItems = Array.from(document.querySelectorAll('.text-item'));
   if (textItems.length === 0) return;
-   // ── DEBUG ──
-  console.log('=== convertTextsToPaths debug ===');
-  textItems.forEach(item => {
-    console.log('item.dataset.fontFamily:', item.dataset.fontFamily);
-    const textEl = item.querySelector('text');
-    if (textEl) console.log('textEl font-family attr:', textEl.getAttribute('font-family'));
-  });
-  // Fetch fonts.json once
+
   const res  = await fetch('/js/fonts.json');
   const data = await res.json();
 
+  // Flatten keeping folder name so duplicate font names across folders resolve correctly
   function flattenFonts(nodes) {
     const result = [];
     nodes.forEach(n => {
-      if (n.type === 'folder') result.push(...flattenFonts(n.children || []));
-      else if (n.type === 'file') result.push(n);
+      if (n.children) {
+        n.children.forEach(child => {
+          result.push({ folderName: n.name, name: child.name, file: child.file });
+        });
+      }
     });
     return result;
   }
   const allFonts = flattenFonts(data);
-  // ── DEBUG ──
-  console.log('allFonts names:', allFonts.map(f => f.name));
-  // Cache loaded opentype fonts so we don't fetch the same file twice
+
+  // Use file URL as cache key so same-named fonts in different folders don't collide
   const fontCache = {};
-  
 
   for (const item of textItems) {
-    const fontName  = item.dataset.fontFamily;
-    const textEl    = item.querySelector('text');
+    const fontName   = item.dataset.fontFamily;
+    const folderName = item.dataset.fontFolder;
+    const textEl     = item.querySelector('text');
     if (!textEl) continue;
 
-    const fontEntry = allFonts.find(f => f.name === fontName);
-    // ── DEBUG ──
-    console.log(`Looking for "${fontName}" → found:`, fontEntry);
+    // Match on both name and folder if available, fall back to name only
+    const fontEntry = folderName
+      ? allFonts.find(f => f.name === fontName && f.folderName === folderName)
+      : allFonts.find(f => f.name === fontName);
+
     if (!fontEntry) {
-      console.warn('Font entry not found for:', fontName);
+      console.warn(`Font entry not found for: "${fontName}" in folder "${folderName}"`);
       continue;
     }
 
     try {
-      // Load and cache the opentype font
-      if (!fontCache[fontName]) {
+      const cacheKey = fontEntry.file;
+      if (!fontCache[cacheKey]) {
         const fontRes    = await fetch(fontEntry.file);
         const fontBuffer = await fontRes.arrayBuffer();
-        fontCache[fontName] = opentype.parse(fontBuffer);
+        fontCache[cacheKey] = opentype.parse(fontBuffer);
       }
-      const font = fontCache[fontName];
+      const font = fontCache[cacheKey];
 
-      // Gather text properties
       const textContent = textEl.textContent || '';
       const fontSize    = parseFloat(textEl.getAttribute('font-size') || item.dataset.fontSize || 36);
       const fill        = textEl.getAttribute('fill') || '#000000';
 
-      // Get the bounding box of the nested svg to calculate center
       const nestedSvg = item.querySelector('svg');
       const svgW      = parseFloat(nestedSvg.getAttribute('width'))  || 200;
       const svgH      = parseFloat(nestedSvg.getAttribute('height')) || 60;
       const svgX      = parseFloat(nestedSvg.getAttribute('x'))      || 0;
       const svgY      = parseFloat(nestedSvg.getAttribute('y'))      || 0;
 
-      // Measure text width using opentype so we can center it
       const glyphs    = font.stringToGlyphs(textContent);
       const textWidth = glyphs.reduce((sum, g) => sum + (g.advanceWidth || 0), 0)
                         * (fontSize / font.unitsPerEm);
 
-      // Center horizontally, baseline center vertically
       const x = svgX + svgW / 2 - textWidth / 2;
       const y = svgY + svgH / 2 + fontSize * 0.35;
 
-      // Generate the SVG path data from opentype
       const otPath   = font.getPath(textContent, x, y, fontSize);
-      const pathData = otPath.toSVG(2); // returns a <path ...> string
+      const pathData = otPath.toSVG(2);
 
-      // Parse the returned path string into a real element
       const parser  = new DOMParser();
       const pathDoc = parser.parseFromString(
         `<svg xmlns="http://www.w3.org/2000/svg">${pathData}</svg>`,
@@ -712,8 +702,6 @@ async function convertTextsToPaths() {
       if (!pathEl) continue;
 
       pathEl.setAttribute('fill', fill);
-
-      // Replace the <text> element with the <path> inside the nested svg
       nestedSvg.removeChild(textEl);
       nestedSvg.appendChild(document.importNode(pathEl, true));
 
@@ -742,7 +730,6 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   });
 
   try {
-    // Convert text to paths for the exported file
     await convertTextsToPaths();
 
     const serializer = new XMLSerializer();
