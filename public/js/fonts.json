@@ -4,7 +4,7 @@
         "name": "Regular 1",
         "children": [
             {"name": "Blackcraft", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/Blackcraft.woff2"},
-            {"name": "Bulbasaur", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/BulbasaurSP.ttf"},
+            {"name": "Bulbasaur", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/BulbasaurSP.ttf"},
             {"name": "Engravers", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/CAT-Engravers.ttf"},
             {"name": "Chainsaw Carnage", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/ChainsawCarnage.ttf"},
             {"name": "Comic", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/comicsfreeRegular.ttf"},
