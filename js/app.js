@@ -359,7 +359,7 @@ function addTextElement() {
   const g = document.createElementNS(svgNS, 'g');
   g.classList.add('canvas-item', 'text-item');
   g.dataset.fontFamily = defaultFont;
-  g.dataset.fontFolder = 'Regular 1';  // ← Blackcraft lives in Regular 1
+  g.dataset.fontFolder = 'Regular 1';
   g.dataset.fontSize   = fontSize;
   g.dataset.x          = x;
   g.dataset.y          = y;
@@ -631,7 +631,6 @@ async function convertTextsToPaths() {
   const res  = await fetch('/js/fonts.json');
   const data = await res.json();
 
-  // Flatten keeping folder name so duplicate font names across folders resolve correctly
   function flattenFonts(nodes) {
     const result = [];
     nodes.forEach(n => {
@@ -645,7 +644,6 @@ async function convertTextsToPaths() {
   }
   const allFonts = flattenFonts(data);
 
-  // Use file URL as cache key so same-named fonts in different folders don't collide
   const fontCache = {};
 
   for (const item of textItems) {
@@ -654,7 +652,6 @@ async function convertTextsToPaths() {
     const textEl     = item.querySelector('text');
     if (!textEl) continue;
 
-    // Match on both name and folder if available, fall back to name only
     const fontEntry = folderName
       ? allFonts.find(f => f.name === fontName && f.folderName === folderName)
       : allFonts.find(f => f.name === fontName);
@@ -667,7 +664,11 @@ async function convertTextsToPaths() {
     try {
       const cacheKey = fontEntry.file;
       if (!fontCache[cacheKey]) {
-        const fontRes    = await fetch(fontEntry.file);
+        // ── FIXED: explicit CORS mode so Safari sends Origin header ──
+        const fontRes    = await fetch(fontEntry.file, {
+          mode:        'cors',
+          credentials: 'omit'
+        });
         const fontBuffer = await fontRes.arrayBuffer();
         fontCache[cacheKey] = opentype.parse(fontBuffer);
       }
@@ -719,7 +720,6 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   const currentTransform = viewport.getAttribute('transform');
   viewport.removeAttribute('transform');
 
-  // Snapshot text items so we can restore them after export
   const textSnapshots = Array.from(document.querySelectorAll('.text-item')).map(item => {
     const nestedSvg = item.querySelector('svg');
     return {
@@ -752,7 +752,6 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   } catch (error) {
     console.error('Operation failed:', error);
   } finally {
-    // Restore original <text> elements in the live editor
     textSnapshots.forEach(({ nestedSvg, innerHTML }) => {
       nestedSvg.innerHTML = innerHTML;
     });
