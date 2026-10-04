@@ -479,33 +479,49 @@
     });
 
     // ─── Font Loader ─────────────────────────────────────────────────────────
-    async function loadFonts() {
-      try {
-        const response = await fetch('/js/fonts.json');
-        const folders  = await response.json();
+async function loadFonts() {
+  try {
+    const response = await fetch('/js/fonts.json');
+    const folders  = await response.json();
 
-        const css = folders.flatMap(folder => folder.children || []).map(font => `
-          @font-face {
-            font-family: '${font.name}';
-            src: url('${font.file}') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-          }
-        `).join('\n');
+    const allFonts = folders.flatMap(folder => folder.children || []);
 
-        const docStyle = document.createElement('style');
-        docStyle.textContent = css;
-        document.head.appendChild(docStyle);
+    // Preload every font with crossorigin so Safari's FIRST request is CORS-aware
+    allFonts.forEach(font => {
+      const existing = document.querySelector(`link[href="${font.file}"]`);
+      if (existing) return;
+      const link = document.createElement('link');
+      link.rel         = 'preload';
+      link.as          = 'font';
+      link.type        = 'font/ttf';
+      link.crossOrigin = 'anonymous';
+      link.href        = font.file;
+      document.head.appendChild(link);
+    });
 
-        const svgStyle = document.getElementById('font-face-styles');
-        if (svgStyle) svgStyle.textContent = css;
-
-        return folders;
-      } catch (err) {
-        console.warn('fonts.json could not be loaded:', err);
-        return [];
+    const css = allFonts.map(font => `
+      @font-face {
+        font-family: '${font.name}';
+        src: url('${font.file}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
       }
-    }
+    `).join('\n');
+
+    const docStyle = document.createElement('style');
+    docStyle.textContent = css;
+    document.head.appendChild(docStyle);
+
+    const svgStyle = document.getElementById('font-face-styles');
+    if (svgStyle) svgStyle.textContent = css;
+
+    return folders;
+  } catch (err) {
+    console.warn('fonts.json could not be loaded:', err);
+    return [];
+  }
+}
+
 
    // ─── Font Picker Builder ─────────────────────────────────────────────────
 function buildFontPicker(folders) {
