@@ -42,7 +42,7 @@
         "type": "folder",
         "name": "Light",
         "children": [
-            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Light.tff"},
+            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Light.ttf"},
             {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Light.ttf"},
             {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/JollySweaterLight.ttf"}
         ]
