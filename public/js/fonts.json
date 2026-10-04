@@ -4,20 +4,20 @@
         "name": "Regular 1",
         "children": [
             {"name": "Bulbasaur", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/BulbasaurSP.ttf"},
-            {"name": "Engravers", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/CAT-Engravers.ttf"},
-            {"name": "Chainsaw Carnage", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/ChainsawCarnage.ttf"},
-            {"name": "Comic", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/comicsfreeRegular.ttf"},
-            {"name": "Digital", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/DigitalNumbers-Regular.ttf"},
-            {"name": "Durendal and Oliphant", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/DurendalAndOliphantRegular.ttf"},
-            {"name": "Metallic", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/fs-metallic.ttf"}
+            {"name": "Engravers", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/CAT-Engravers.ttf"},
+            {"name": "Chainsaw Carnage", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/ChainsawCarnage.ttf"},
+            {"name": "Comic", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/comicsfreeRegular.ttf"},
+            {"name": "Digital", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/DigitalNumbers-Regular.ttf"},
+            {"name": "Durendal and Oliphant", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/DurendalAndOliphantRegular.ttf"},
+            {"name": "Metallic", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/fs-metallic.ttf"}
         ]
     },
     {
         "type": "folder",
         "name": "Regular 2",
         "children": [
-            {"name": "Jess's Dead", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/jessdead.ttf"},
-            {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/JollySweaterRegular.ttf"},
+            {"name": "Jess's Dead", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/jessdead.ttf"},
+            {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/JollySweaterRegular.ttf"},
             {"name": "Lethal", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/Lethal-font.ttf"},
             {"name": "Beverage", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LT-Beverage.ttf"},
             {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Regular.ttf"},
@@ -43,36 +43,36 @@
         "name": "Light",
         "children": [
             {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Light.tff"},
-            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Light.tff"},
-            {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/JollySweaterLight.tff"}
+            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Light.ttf"},
+            {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/JollySweaterLight.ttf"}
         ]
     },
     {
         "type": "folder",
         "name": "Medium",
         "children": [
-            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Medium.tff"},
-            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Medium.tff"}
+            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Medium.ttf"},
+            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Medium.ttf"}
         ]
     },
     {
         "type": "folder",
         "name": "Bold",
         "children": [
-            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Bold.tff"},
-            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Bold.tff"},
-            {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/JollySweaterBold.tff"},
-            {"name": "Comic", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/comicsfreeBold.tff"}
+            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-Bold.ttf"},
+            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Bold.ttf"},
+            {"name": "Jolly Sweater", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/JollySweaterBold.ttf"},
+            {"name": "Comic", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/comicsfreeBold.ttf"}
          ]
     },
     {
         "type": "folder",
         "name": "Italic",
         "children": [
-            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Italic.tff"},
-            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-LightItalic.tff"},
-            {"name": "Stopwatch", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTStopwatch-Italic.tff"},
-            {"name": "Skateblade", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/Skateblade-Italic.tff"}
+            {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTHumor-Italic.ttf"},
+            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTMuseum-LightItalic.ttf"},
+            {"name": "Stopwatch", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/LTStopwatch-Italic.ttf"},
+            {"name": "Skateblade", "file": "https://amnovelty-svg-uploads.s3.amazonaws.com/fonts/Skateblade-Italic.ttf"}
         ]
     }
 ]
