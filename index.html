@@ -487,7 +487,7 @@
         const css = folders.flatMap(folder => folder.children || []).map(font => `
           @font-face {
             font-family: '${font.name}';
-            src: url('${font.file}') format('woff2');
+            src: url('${font.file}') format('truetype');
             font-weight: normal;
             font-style: normal;
           }
