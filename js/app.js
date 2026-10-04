@@ -625,21 +625,15 @@ function updateControlsPosition(el) {
   controls.querySelector('rect').setAttribute('y',    top  + height - 6);
 }
 
-// ─── Embed Fonts into SVG Before Export ──────────────────────────────────────
-async function embedFontsIntoSVG() {
-  // Collect all unique font families used by text items
-  const usedFonts = new Set();
-  document.querySelectorAll('.text-item').forEach(el => {
-    if (el.dataset.fontFamily) usedFonts.add(el.dataset.fontFamily);
-  });
+// ─── Convert Text Elements to Paths Before Export ────────────────────────────
+async function convertTextsToPaths() {
+  const textItems = Array.from(document.querySelectorAll('.text-item'));
+  if (textItems.length === 0) return;
 
-  if (usedFonts.size === 0) return;
-
-  // Fetch fonts.json to find the file path for each used font
+  // Fetch fonts.json once
   const res  = await fetch('/js/fonts.json');
   const data = await res.json();
 
-  // Flatten nested folder structure
   function flattenFonts(nodes) {
     const result = [];
     nodes.forEach(n => {
@@ -650,47 +644,73 @@ async function embedFontsIntoSVG() {
   }
   const allFonts = flattenFonts(data);
 
-  // Build @font-face rules with base64 encoded font data
-  let styleContent = '';
-  for (const fontName of usedFonts) {
+  // Cache loaded opentype fonts so we don't fetch the same file twice
+  const fontCache = {};
+
+  for (const item of textItems) {
+    const fontName  = item.dataset.fontFamily;
+    const textEl    = item.querySelector('text');
+    if (!textEl) continue;
+
     const fontEntry = allFonts.find(f => f.name === fontName);
-    if (!fontEntry) continue;
+    if (!fontEntry) {
+      console.warn('Font entry not found for:', fontName);
+      continue;
+    }
 
     try {
-      const fontRes    = await fetch(fontEntry.file);
-      const fontBuffer = await fontRes.arrayBuffer();
-      const base64     = btoa(String.fromCharCode(...new Uint8Array(fontBuffer)));
-      const ext        = fontEntry.file.split('.').pop().toLowerCase();
-      const mimeMap    = {
-        woff2: 'font/woff2',
-        woff:  'font/woff',
-        ttf:   'font/truetype',
-        otf:   'font/opentype'
-      };
-      const mime   = mimeMap[ext] || 'font/woff2';
-      const format = ext === 'ttf' ? 'truetype' : ext;
+      // Load and cache the opentype font
+      if (!fontCache[fontName]) {
+        const fontRes    = await fetch(fontEntry.file);
+        const fontBuffer = await fontRes.arrayBuffer();
+        fontCache[fontName] = opentype.parse(fontBuffer);
+      }
+      const font = fontCache[fontName];
 
-      styleContent += `
-        @font-face {
-          font-family: '${fontName}';
-          src: url('data:${mime};base64,${base64}') format('${format}');
-        }
-      `;
+      // Gather text properties
+      const textContent = textEl.textContent || '';
+      const fontSize    = parseFloat(textEl.getAttribute('font-size') || item.dataset.fontSize || 36);
+      const fill        = textEl.getAttribute('fill') || '#000000';
+
+      // Get the bounding box of the nested svg to calculate center
+      const nestedSvg = item.querySelector('svg');
+      const svgW      = parseFloat(nestedSvg.getAttribute('width'))  || 200;
+      const svgH      = parseFloat(nestedSvg.getAttribute('height')) || 60;
+      const svgX      = parseFloat(nestedSvg.getAttribute('x'))      || 0;
+      const svgY      = parseFloat(nestedSvg.getAttribute('y'))      || 0;
+
+      // Measure text width using opentype so we can center it
+      const glyphs    = font.stringToGlyphs(textContent);
+      const textWidth = glyphs.reduce((sum, g) => sum + (g.advanceWidth || 0), 0)
+                        * (fontSize / font.unitsPerEm);
+
+      // Center horizontally, baseline center vertically
+      const x = svgX + svgW / 2 - textWidth / 2;
+      const y = svgY + svgH / 2 + fontSize * 0.35;
+
+      // Generate the SVG path data from opentype
+      const otPath   = font.getPath(textContent, x, y, fontSize);
+      const pathData = otPath.toSVG(2); // returns a <path ...> string
+
+      // Parse the returned path string into a real element
+      const parser  = new DOMParser();
+      const pathDoc = parser.parseFromString(
+        `<svg xmlns="http://www.w3.org/2000/svg">${pathData}</svg>`,
+        'image/svg+xml'
+      );
+      const pathEl = pathDoc.querySelector('path');
+      if (!pathEl) continue;
+
+      pathEl.setAttribute('fill', fill);
+
+      // Replace the <text> element with the <path> inside the nested svg
+      nestedSvg.removeChild(textEl);
+      nestedSvg.appendChild(document.importNode(pathEl, true));
+
     } catch (err) {
-      console.warn('Could not embed font:', fontName, err);
+      console.warn('Could not convert text to path for:', fontName, err);
     }
   }
-
-  if (!styleContent) return;
-
-  // Remove any previously injected style block, then insert fresh one
-  const existing = canvas.querySelector('style#embedded-fonts');
-  if (existing) existing.remove();
-
-  const styleEl = document.createElementNS(svgNS, 'style');
-  styleEl.setAttribute('id', 'embedded-fonts');
-  styleEl.textContent = styleContent;
-  canvas.insertBefore(styleEl, canvas.firstChild);
 }
 
 // ─── Export & Upload to S3 ────────────────────────────────────────────────────
@@ -701,9 +721,19 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   const currentTransform = viewport.getAttribute('transform');
   viewport.removeAttribute('transform');
 
+  // Snapshot text items so we can restore them after export
+  const textSnapshots = Array.from(document.querySelectorAll('.text-item')).map(item => {
+    const nestedSvg = item.querySelector('svg');
+    return {
+      item,
+      nestedSvg,
+      innerHTML: nestedSvg.innerHTML
+    };
+  });
+
   try {
-    // Embed any used fonts as base64 before serializing
-    await embedFontsIntoSVG();
+    // Convert text to paths for the exported file
+    await convertTextsToPaths();
 
     const serializer = new XMLSerializer();
     const svgData    = serializer.serializeToString(canvas);
@@ -725,9 +755,10 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   } catch (error) {
     console.error('Operation failed:', error);
   } finally {
-    // Remove embedded font style so it doesn't persist in the live editor
-    const embedded = canvas.querySelector('style#embedded-fonts');
-    if (embedded) embedded.remove();
+    // Restore original <text> elements in the live editor
+    textSnapshots.forEach(({ nestedSvg, innerHTML }) => {
+      nestedSvg.innerHTML = innerHTML;
+    });
 
     if (currentTransform) viewport.setAttribute('transform', currentTransform);
     console.log('Editor view restored.');
