@@ -70,7 +70,6 @@
         "name": "Italic",
         "children": [
             {"name": "Humor", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/LTHumor-Italic.ttf"},
-            {"name": "Museum", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/LTMuseum-LightItalic.ttf"},
             {"name": "Stopwatch", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/LTStopwatch-Italic.ttf"},
             {"name": "Skateblade", "file": "https://amnovelty-svg-uploads.s3.us-east-2.amazonaws.com/fonts/Skateblade-Italic.ttf"}
         ]
