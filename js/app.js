@@ -629,7 +629,13 @@ function updateControlsPosition(el) {
 async function convertTextsToPaths() {
   const textItems = Array.from(document.querySelectorAll('.text-item'));
   if (textItems.length === 0) return;
-
+   // ── DEBUG ──
+  console.log('=== convertTextsToPaths debug ===');
+  textItems.forEach(item => {
+    console.log('item.dataset.fontFamily:', item.dataset.fontFamily);
+    const textEl = item.querySelector('text');
+    if (textEl) console.log('textEl font-family attr:', textEl.getAttribute('font-family'));
+  });
   // Fetch fonts.json once
   const res  = await fetch('/js/fonts.json');
   const data = await res.json();
@@ -643,9 +649,11 @@ async function convertTextsToPaths() {
     return result;
   }
   const allFonts = flattenFonts(data);
-
+  // ── DEBUG ──
+  console.log('allFonts names:', allFonts.map(f => f.name));
   // Cache loaded opentype fonts so we don't fetch the same file twice
   const fontCache = {};
+  
 
   for (const item of textItems) {
     const fontName  = item.dataset.fontFamily;
@@ -653,6 +661,8 @@ async function convertTextsToPaths() {
     if (!textEl) continue;
 
     const fontEntry = allFonts.find(f => f.name === fontName);
+    // ── DEBUG ──
+    console.log(`Looking for "${fontName}" → found:`, fontEntry);
     if (!fontEntry) {
       console.warn('Font entry not found for:', fontName);
       continue;
